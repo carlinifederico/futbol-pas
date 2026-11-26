@@ -26,11 +26,14 @@ button,select,input{font:inherit;color:inherit}
 .mk,.slot{cursor:pointer}
 .mk.hot .ring,.slot.hot .ring{opacity:1}
 .bal{display:flex;align-items:center;gap:8px}
-.track{position:relative;flex:1;height:22px;display:flex;border:2px solid var(--ink);overflow:hidden;background:var(--white-shirt)}
+.track{position:relative;flex:1;height:22px;display:flex;border:2px solid var(--ink);background:var(--white-shirt)}
 .track i{display:flex;align-items:center;font-style:normal;font-family:var(--display);font-size:12.5px;letter-spacing:.03em;white-space:nowrap;overflow:hidden;transition:width .4s cubic-bezier(.3,1.3,.5,1)}
 .track .a{background:var(--navy-shirt);color:var(--chalk);padding-left:6px}
 .track .b{background:var(--white-shirt);justify-content:flex-end;padding-right:6px}
-.track::after{content:"";position:absolute;left:50%;top:-2px;bottom:-2px;width:3px;margin-left:-1.5px;background:var(--mustard)}
+.track::after{content:"";position:absolute;left:50%;top:-6px;bottom:-6px;width:0;border-left:2px dashed rgba(27,33,64,.45);margin-left:-1px;pointer-events:none}
+.knob{position:absolute;z-index:2;left:50%;top:-7px;bottom:-7px;width:12px;margin-left:-6px;border-radius:5px;background:var(--mustard);border:2px solid var(--ink);box-shadow:0 2px 4px rgba(0,0,0,.3);transition:left .5s cubic-bezier(.3,1.4,.5,1),background-color .3s}
+.knob.v1{background:#3fae5a}.knob.v2{background:#f2a93b}.knob.v3{background:var(--red)}
+@keyframes knobmv{0%{transform:scale(1)}40%{transform:scale(1.35,1.15)}100%{transform:scale(1)}}.knob.mv{animation:knobmv .5s ease-out}
 .verd{flex:none;min-width:74px;text-align:center;font-family:var(--type);font-weight:700;font-size:11.5px;text-transform:uppercase;border:2px solid currentColor;padding:1px 5px;transform:rotate(-2deg);color:var(--ink-soft)}
 .verd.v1{color:var(--ok)}.verd.v2{color:#9a7410}.verd.v3{color:var(--red)}
 .acts{display:flex;gap:5px}
@@ -159,7 +162,7 @@ dialog .dbar .btn.primary{flex:1}
       <button type="button" class="clr" id="btnClr" aria-label="Limpiar cancha" title="Limpiar cancha" hidden>✕</button>
       <label class="fsel a"><span>Oscuros</span><select id="formA" aria-label="Formación de Oscuros"></select></label>
       <label class="fsel b"><span>Claros</span><select id="formB" aria-label="Formación de Claros"></select></label></div>
-    <div class="bal" aria-live="polite"><div class="track"><i class="a" id="barA"></i><i class="b" id="barB"></i></div><span class="verd" id="verd">—</span></div>
+    <div class="bal" aria-live="polite"><div class="track"><i class="a" id="barA"></i><i class="b" id="barB"></i><b class="knob" id="balK"></b></div><span class="verd" id="verd">—</span></div>
     <div class="acts">
       <button class="btn primary" id="btnAuto" type="button">⚖️ Armar parejos</button>
       <button class="btn" id="btnOther" type="button">🔄 Otra opción</button>
@@ -327,11 +330,11 @@ $('pitch').addEventListener('click',e=>{const x=e.target.closest('[data-rmx]');i
 $('btnClr').onclick=()=>{const was=M.sel.slice();M.sel=[];for(const k of['A','B']){M[k].gk=null;M[k].s=M[k].s.map(()=>null);}opts=[];pick=null;commit();was.forEach(updateRow);toast('Cancha limpia');};
 /* promedio real de cada equipo, en la misma escala de los votos (1 a 5) */
 function balInfo(){const na=members('A').length,nb=members('B').length,avA=na?teamVal('A')/na/2:0,avB=nb?teamVal('B')/nb/2:0;
-  const pa=na&&nb?Math.round(Math.max(15,Math.min(85,50+(avA-avB)*40))):50;return{avA,avB,pa};}
+  const pa=na&&nb&&avA+avB>0?avA/(avA+avB)*100:50;return{avA,avB,pa,pr:Math.round(pa)};}
 function renderTop(){renderPitch();const n=placed().length,c=M.sel.length,a=teamVal('A'),b=teamVal('B');
-  const{avA,avB,pa}=balInfo();$('barA').style.width=pa+'%';$('barB').style.width=(100-pa)+'%';
-  $('barA').textContent=members('A').length?`Oscuros ${fmt1(avA)}`:'Oscuros';$('barB').textContent=members('B').length?`${fmt1(avB)} Claros`:'Claros';
-  const v=$('verd');if(n===10){const[l,cl]=verdictOf(Math.abs(a-b));v.textContent=l;v.className='verd '+cl;}else{v.textContent=n?`Faltan ${10-n}`:'—';v.className='verd';}
+  const{avA,avB,pa,pr}=balInfo();const K=$('balK');K.style.left=pa+'%';if(K._p!=null&&Math.abs(K._p-pa)>.05){K.classList.remove('mv');void K.offsetWidth;K.classList.add('mv');}K._p=pa;$('barA').style.width=pa+'%';$('barB').style.width=(100-pa)+'%';
+  const full=members('A').length&&members('B').length;$('barA').textContent=full?`Oscuros ${pr}%`:'Oscuros';$('barB').textContent=full?`${100-pr}% Claros`:'Claros';
+  const v=$('verd');if(n===10){const[l,cl]=verdictOf(Math.abs(a-b));v.textContent=l;v.className='verd '+cl;K.className='knob '+cl;}else{K.className='knob';v.textContent=n?`Faltan ${10-n}`:'—';v.className='verd';}
   $('btnAuto').disabled=c!==10;$('btnAuto').textContent=c===10?'⚖️ Armar parejos':c?`Faltan ${10-c}`:'Elegí 10 abajo';
   $('btnClr').hidden=!n&&!c;$('btnOther').disabled=n!==10;$('btnImg').disabled=n!==10;
   $('cnt').textContent=`${c}/10`;$('cnt').classList.toggle('full',c===10);}
@@ -466,12 +469,12 @@ async function pitchPng(){const src=await vPitchSVG();
   const img=new Image();await new Promise((ok,ko)=>{img.onload=ok;img.onerror=ko;img.src='data:image/svg+xml;charset=utf-8,'+encodeURIComponent(src);});
   const c=document.createElement('canvas');c.width=840;c.height=1470;const g=c.getContext('2d');
   g.fillStyle='#efe5cc';g.fillRect(0,0,840,1470);g.fillStyle='#1b2140';g.fillRect(14,14,812,1292);g.drawImage(img,20,20,800,1280);
-  const a=teamVal('A'),b=teamVal('B'),{avA,avB,pa}=balInfo(),[lab]=verdictOf(Math.abs(a-b));
+  const a=teamVal('A'),b=teamVal('B'),{avA,avB,pa,pr}=balInfo(),[lab]=verdictOf(Math.abs(a-b));
   g.textBaseline='middle';const t=lab.toUpperCase();g.font='bold 30px "Courier Prime","Courier New",monospace';const w=g.measureText(t).width+44;
   g.save();g.translate(420,1350);g.rotate(-.035);g.strokeStyle='#1b2140';g.lineWidth=4;g.strokeRect(-w/2,-25,w,50);g.fillStyle='#1b2140';g.textAlign='center';g.fillText(t,0,2);g.restore();
   const bx=40,by=1395,bw=760,bh=44,wa=Math.round(bw*pa/100);g.fillStyle='#1b2442';g.fillRect(bx,by,wa,bh);g.fillStyle='#fbf8ee';g.fillRect(bx+wa,by,bw-wa,bh);
-  g.strokeStyle='#1b2140';g.lineWidth=3;g.strokeRect(bx,by,bw,bh);g.fillStyle='#e2b93b';g.fillRect(bx+bw/2-2,by-4,4,bh+8);
-  g.font='26px Anton, Impact, sans-serif';g.textAlign='left';g.fillStyle='#f7f1de';g.fillText(`OSCUROS ${fmt1(avA)}`,bx+12,by+bh/2+1);g.textAlign='right';g.fillStyle='#1b2140';g.fillText(`${fmt1(avB)} CLAROS`,bx+bw-12,by+bh/2+1);
+  g.strokeStyle='#1b2140';g.lineWidth=3;g.strokeRect(bx,by,bw,bh);g.setLineDash([6,5]);g.strokeStyle='rgba(27,33,64,.5)';g.lineWidth=2;g.beginPath();g.moveTo(bx+bw/2,by-8);g.lineTo(bx+bw/2,by+bh+8);g.stroke();g.setLineDash([]);g.fillStyle='#e2b93b';g.fillRect(bx+wa-7,by-10,14,bh+20);g.strokeStyle='#1b2140';g.lineWidth=3;g.strokeRect(bx+wa-7,by-10,14,bh+20);
+  g.font='26px Anton, Impact, sans-serif';g.textAlign='left';g.fillStyle='#f7f1de';g.fillText(`OSCUROS ${pr}%`,bx+12,by+bh/2+1);g.textAlign='right';g.fillStyle='#1b2140';g.fillText(`${100-pr}% CLAROS`,bx+bw-12,by+bh/2+1);
   return new Promise((ok,ko)=>c.toBlob(bl=>bl?ok(bl):ko(),'image/png'));}
 $('btnImg').onclick=async()=>{if(placed().length<10)return;try{imgBlob=await pitchPng();$('imgOut').src=URL.createObjectURL(imgBlob);
   let can=false;try{can=!!(navigator.canShare&&navigator.canShare({files:[new File([imgBlob],'partido.png',{type:'image/png'})]}));}catch(e){}
