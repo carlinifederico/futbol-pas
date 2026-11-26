@@ -125,7 +125,7 @@ dialog form{padding:16px;display:flex;flex-direction:column;gap:12px}
 
 <div class="wrap">
   <div class="top">
-    <div><h1>Armá el partido</h1><p class="sub">Arrastrá las figuritas a la cancha o tocalas para sumarlas. Remera oscura contra remera clara.</p></div>
+    <div><h1>Armá el partido</h1><p class="sub">1) Convocá a los 10 · 2) Armar parejos · 3) Retocá arrastrando en la cancha. Remera oscura contra remera clara.</p></div>
     <div class="bar">
       <div class="f"><label for="mDate">Fecha</label><input id="mDate" type="date"></div>
       <div class="f"><label for="mForm">Formación</label>
@@ -149,7 +149,7 @@ dialog form{padding:16px;display:flex;flex-direction:column;gap:12px}
       </div>
       <div class="pitchbox"><svg id="pitch" viewBox="0 0 400 640" role="img" aria-label="Cancha: soltá acá las figuritas"></svg></div>
       <div class="bar">
-        <button class="btn" id="btnClear">Vaciar cancha</button>
+        <button class="btn" id="btnClear">Empezar de nuevo</button>
         <button class="btn" id="btnImg">Compartir imagen</button>
         <button class="btn" id="btnCopy">Copiar para WhatsApp</button>
         <button class="btn" id="btnSave">Guardar partido</button>
@@ -159,7 +159,7 @@ dialog form{padding:16px;display:flex;flex-direction:column;gap:12px}
     <section class="col plantel" aria-label="Plantel">
       <div class="benchbox" id="benchbox" data-drop="bench">
         <div class="bar" style="justify-content:space-between"><span class="stephead"><span class="num">1</span>¿Quiénes juegan?</span><span class="cnt" id="count"></span></div>
-        <p class="hint" style="margin:0">Tocá las figuritas para convocarlas (o para sacarlas). Con la <b>i</b> le marcás posición y cómo juega. También podés arrastrarlas a un lugar de la cancha.</p>
+        <p class="hint" style="margin:0">Tocá las figuritas de los 10 que juegan (otra vez para sacarlos). Con la <b>i</b> marcás posición y cómo juega. Después tocá <b>Armar parejos</b>.</p>
         <div class="bench" id="bench"></div>
       </div>
       <div class="saved" id="savedWrap" hidden>
@@ -225,8 +225,10 @@ const KEY='pas-armador-v2';
 
 let DB={custom:[],matches:[]};
 let M=null, opts=[], optIdx=0, photoDraft=null, tipSwap=null, detId=null;
-const blank=()=>({date:new Date().toISOString().slice(0,10),form:'2-2',A:{gk:null,s:[null,null,null,null]},B:{gk:null,s:[null,null,null,null]},det:{}});
-function load(){try{const d=JSON.parse(localStorage.getItem(KEY)||'null');if(d){DB.custom=d.custom||[];DB.matches=d.matches||[];M=d.draft||null;}}catch(e){}if(!M)M=blank();}
+const blank=()=>({sel:[],date:new Date().toISOString().slice(0,10),form:'2-2',A:{gk:null,s:[null,null,null,null]},B:{gk:null,s:[null,null,null,null]},det:{}});
+function load(){try{const d=JSON.parse(localStorage.getItem(KEY)||'null');if(d){DB.custom=d.custom||[];DB.matches=d.matches||[];M=d.draft||null;}}catch(e){}if(!M)M=blank();fixSel(M);}
+function fixSel(m){if(!Array.isArray(m.sel))m.sel=['A','B'].flatMap(k=>[m[k].gk,...m[k].s]).filter(Boolean);}
+const isSel=id=>M.sel.includes(id);
 function save(){try{localStorage.setItem(KEY,JSON.stringify({custom:DB.custom,matches:DB.matches,draft:M}));}catch(e){}}
 const $=id=>document.getElementById(id);
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
@@ -293,8 +295,10 @@ function autoPlace(id){if(where(id))return;
   for(const k of order){if(!M[k].gk){M[k].gk=id;return true;}const i=M[k].s.indexOf(null);if(i>=0){M[k].s[i]=id;return true;}}
   toast('La cancha está llena: arrastrá a alguien al plantel para hacer lugar.');return false;}
 function moveTo(id,k,s){const from=where(id);if(from&&from.k===k&&from.s===s)return;const occ=get(k,s);
+  if(!isSel(id)){if(M.sel.length>=10&&!occ){toast('Ya hay 10 convocados: soltalo sobre alguien para reemplazarlo.');return;}
+    if(occ&&!from)M.sel.splice(M.sel.indexOf(occ),1);M.sel.push(id);}
   if(from)set(from.k,from.s,occ);set(k,s,id);opts=[];commit();}
-function removeFromPitch(id){const w=where(id);if(w){set(w.k,w.s,null);opts=[];commit();}}
+function removeFromPitch(id){const w=where(id);if(w)set(w.k,w.s,null);const i=M.sel.indexOf(id);if(i>=0)M.sel.splice(i,1);opts=[];commit();}
 
 /* ---------- Render ---------- */
 function commit(){save();render();}
@@ -302,7 +306,7 @@ function render(){renderMeter();renderPitch();renderBench();renderSaved();}
 function renderMeter(){const a=teamVal('A'),b=teamVal('B'),n=placed().length;
   const pa=a+b>0?Math.round(a/(a+b)*100):50;$('barA').style.width=pa+'%';$('barB').style.width=(100-pa)+'%';
   $('barA').textContent=`Oscuros ${pa}%`;$('barB').textContent=`${100-pa}% Claros`;
-  if(n<10){$('mTitle').textContent=`${n}/10 en cancha`;$('mStamp').textContent=`Faltan ${10-n}`;$('mStamp').style.color='#f7f1de';}
+  if(n<10){const c=M.sel.length;$('mTitle').textContent=`${c}/10 convocados`;$('mStamp').textContent=c<10?`Faltan ${10-c}`:'Tocá Armar parejos';$('mStamp').style.color=c<10?'#f7f1de':'#e2b93b';}
   else{const[l,c]=verdictOf(Math.abs(a-b));$('mTitle').textContent=`Fecha ${ddmm(M.date)}`;$('mStamp').textContent=l;$('mStamp').style.color=c;}
   tipSwap=bestSwap();$('tip').hidden=!tipSwap;
   if(tipSwap){const na=teamVal('A')+val(tipSwap.b,tipSwap.i<0)-val(tipSwap.a,tipSwap.i<0),nb=teamVal('B')-val(tipSwap.b,tipSwap.i<0)+val(tipSwap.a,tipSwap.i<0),np=Math.round(na/(na+nb)*100);
@@ -340,12 +344,13 @@ function renderPitch(){let s=pitchBase();
   s+=`<g transform="translate(26 40) rotate(-4)" pointer-events="none"><rect x="-4" y="-16" width="104" height="22" fill="#1b2442"/><text x="2" y="1" font-family="${DISPLAY}" font-size="15" fill="#f7f1de">REMERA OSCURA</text></g>`;
   s+=`<g transform="translate(278 612) rotate(3)" pointer-events="none"><rect x="-4" y="-16" width="100" height="22" fill="#fbf8ee" stroke="#1b2140"/><text x="2" y="1" font-family="${DISPLAY}" font-size="15" fill="#1b2140">REMERA CLARA</text></g>`;
   $('pitch').innerHTML=s;}
-function renderBench(){const pl=placed();$('count').textContent=`${pl.length}/10`;$('count').classList.toggle('full',pl.length===10);
-  $('btnAuto').disabled=$('btnOther').disabled=pl.length!==10;
-  $('autoSub').textContent=pl.length===10?'Reparte a los 10 en dos equipos parejos':`Primero elegí a los 10 (faltan ${10-pl.length})`;
-  $('otherSub').textContent=pl.length===10?(opts.length>1?`Vas por la ${optIdx+1} de ${opts.length}`:'Otra combinación igual de pareja'):'Se habilita con los 10';
+function renderBench(){const c=M.sel.length,armed=placed().length===10;$('count').textContent=`${c}/10`;$('count').classList.toggle('full',c===10);
+  $('btnAuto').disabled=c!==10;$('btnOther').disabled=!armed;
+  $('autoSub').textContent=c===10?(armed?'Volver a repartir desde cero':'Reparte a los 10 en la cancha, parejos'):`Primero convocá a los 10 (faltan ${10-c})`;
+  $('otherSub').textContent=armed?(opts.length>1?`Vas por la ${optIdx+1} de ${opts.length}`:'Otra combinación igual de pareja'):'Se habilita después de armar';
   $('bench').innerHTML=all().map(p=>{const w=where(p.id);
-    return `<div class="bcard${w?' in':''}" data-drag="${p.id}" tabindex="0" role="button" aria-label="${esc(p.name)}${w?', en '+TEAM[w.k].name:''}">
+    const on=isSel(p.id);
+    return `<div class="bcard${on?' in':''}" data-drag="${p.id}" tabindex="0" role="button" aria-pressed="${on}" aria-label="${esc(p.name)}${on?', convocado':''}">
       ${w?`<span class="tag ${w.k}">${TEAM[w.k].name}</span>`:''}<span class="chk">✓ JUEGA</span><button type="button" class="info" data-info="${p.id}" aria-label="Detalles de ${esc(p.name)}">i</button>
       <span class="fig" style="--rot:${rot(p.id)*.6}deg">${figHTML(p)}</span><span class="nm">${esc(p.name)}</span></div>`;}).join('')+
     `<button type="button" class="add" id="btnAdd"><span><b>+</b>Sumar jugador</span></button>`;
@@ -354,7 +359,7 @@ function renderSaved(){$('savedWrap').hidden=!DB.matches.length;
   $('saved').innerHTML=DB.matches.map((m,i)=>`<div class="match"><b>${esc(ddmm(m.date)||'Sin fecha')}</b>
     <span class="who">⚫ ${[m.A.gk,...m.A.s].filter(Boolean).map(id=>esc(P(id)?.name||'?')).join(', ')}<br>⚪ ${[m.B.gk,...m.B.s].filter(Boolean).map(id=>esc(P(id)?.name||'?')).join(', ')}</span>
     <span class="bar"><button class="btn small" data-open="${i}">Abrir</button><button class="btn small" data-del="${i}">Borrar</button></span></div>`).join('');
-  $('saved').querySelectorAll('[data-open]').forEach(b=>b.onclick=()=>{M=JSON.parse(JSON.stringify(DB.matches[+b.dataset.open]));opts=[];syncInputs();commit();window.scrollTo(0,0);});
+  $('saved').querySelectorAll('[data-open]').forEach(b=>b.onclick=()=>{M=JSON.parse(JSON.stringify(DB.matches[+b.dataset.open]));fixSel(M);opts=[];syncInputs();commit();window.scrollTo(0,0);});
   $('saved').querySelectorAll('[data-del]').forEach(b=>b.onclick=()=>{if(!b.dataset.armed){b.dataset.armed='1';b.textContent='¿Seguro?';return;}DB.matches.splice(+b.dataset.del,1);commit();});}
 
 /* ---------- Arrastrar y soltar (mouse y dedo) ---------- */
@@ -376,11 +381,13 @@ function endDrag(e,cancel){if(!drag)return;const d=drag;drag=null;document.body.
   moveTo(d.id,target.dataset.team,+target.dataset.slot);}
 document.addEventListener('pointerup',e=>endDrag(e,false));
 document.addEventListener('pointercancel',e=>endDrag(e,true));
-document.addEventListener('click',e=>{const s=e.target.closest('.slot');if(s&&!drag){const free=all().find(p=>!where(p.id));toast('Arrastrá una figurita del plantel hasta acá');}
+document.addEventListener('click',e=>{const s=e.target.closest('.slot');if(s&&!drag){toast(M.sel.length<10?'Primero convocá a los 10 en el plantel.':'Tocá Armar parejos para repartirlos.');}
   const inf=e.target.closest('[data-info]');if(inf){e.stopPropagation();openDet(inf.dataset.info);}});
 document.addEventListener('keydown',e=>{if((e.key==='Enter'||e.key===' ')&&e.target.matches('[data-drag]')){e.preventDefault();tap(e.target.dataset.drag,e.target);}});
 function tap(id,src){if(src.classList.contains('mk')){openDet(id);return;}
-  if(where(id)){removeFromPitch(id);toast(`${P(id).name} sale del partido`);return;}if(autoPlace(id)){opts=[];commit();toast(`${P(id).name} → ${TEAM[where(id).k].name}`);}}
+  if(isSel(id)){removeFromPitch(id);return;}
+  if(M.sel.length>=10){toast('Ya hay 10 convocados. Tocá a alguien para sacarlo.');return;}
+  M.sel.push(id);opts=[];commit();return;if(autoPlace(id)){opts=[];commit();toast(`${P(id).name} → ${TEAM[where(id).k].name}`);}}
 
 /* ---------- Detalles ---------- */
 function openDet(id){detId=id;const p=P(id),d=det(id),w=where(id);
@@ -404,19 +411,19 @@ $('aPhoto').addEventListener('change',e=>{const f=e.target.files[0];if(!f)return
     c.getContext('2d').drawImage(img,(img.width-s)/2,(img.height-s)/2,s,s,0,0,300,300);photoDraft=c.toDataURL('image/jpeg',.8);$('aAva').innerHTML=`<img src="${photoDraft}" alt="">`;};img.src=r.result;};r.readAsDataURL(f);e.target.value='';});
 $('aCancel').onclick=()=>$('addDlg').close();
 $('addFrm').addEventListener('submit',e=>{e.preventDefault();const name=$('aName').value.trim();if(!name)return;
-  const p={id:'c'+Date.now().toString(36),name,photo:photoDraft,custom:true};DB.custom.push(p);$('addDlg').close();autoPlace(p.id);commit();toast(`${name} sumado`);});
+  const p={id:'c'+Date.now().toString(36),name,photo:photoDraft,custom:true};DB.custom.push(p);$('addDlg').close();if(M.sel.length<10)M.sel.push(p.id);commit();toast(`${name} sumado`);});
 
 /* ---------- Acciones ---------- */
 function syncInputs(){$('mDate').value=M.date||'';$('mForm').value=M.form||'2-2';}
 $('mDate').onchange=e=>{M.date=e.target.value;commit();};
 $('mForm').onchange=e=>{M.form=e.target.value;for(const k of['A','B']){const f=M[k].s.filter(Boolean);const sl=bestSlots(f.concat(Array(4-f.length).fill(null)).filter(Boolean));
   M[k].s=[...sl,...Array(4-sl.length).fill(null)];}commit();};
-$('btnAuto').onclick=()=>{const pl=placed();if(pl.length!==10){toast(pl.length<10?`Faltan ${10-pl.length}: tocá figuritas del plantel para sumarlas.`:'Hay más de 10.');return;}
+$('btnAuto').onclick=()=>{const pl=M.sel.slice();if(pl.length!==10){toast(`Faltan ${10-pl.length} convocados.`);return;}
   opts=computeOpts(pl);optIdx=0;applyOpt(opts[0]);commit();toast('Equipos armados');};
-$('btnOther').onclick=()=>{const pl=placed();if(pl.length!==10){toast('Primero completá los 10.');return;}if(!opts.length)opts=computeOpts(pl);
+$('btnOther').onclick=()=>{const pl=M.sel.slice();if(placed().length!==10){toast('Primero tocá Armar parejos.');return;}if(!opts.length)opts=computeOpts(pl);
   optIdx=(optIdx+1)%opts.length;applyOpt(opts[optIdx]);commit();toast(`Opción ${optIdx+1} de ${opts.length}`);};
-$('btnClear').onclick=e=>{const b=e.currentTarget;if(!b.dataset.armed){b.dataset.armed='1';b.textContent='¿Vaciar?';setTimeout(()=>{b.dataset.armed='';b.textContent='Vaciar cancha';},2500);return;}
-  b.dataset.armed='';b.textContent='Vaciar cancha';const keep={date:M.date,form:M.form,det:M.det};M={...blank(),...keep};opts=[];commit();};
+$('btnClear').onclick=e=>{const b=e.currentTarget;if(!b.dataset.armed){b.dataset.armed='1';b.textContent='¿Seguro?';setTimeout(()=>{b.dataset.armed='';b.textContent='Empezar de nuevo';},2500);return;}
+  b.dataset.armed='';b.textContent='Empezar de nuevo';const keep={date:M.date,form:M.form,det:M.det,sel:[]};M={...blank(),...keep};opts=[];commit();};
 $('btnSave').onclick=()=>{if(placed().length<10){toast('Completá los 10 para guardar.');return;}M.saved=M.saved||Date.now();const c=JSON.parse(JSON.stringify(M));
   const i=DB.matches.findIndex(m=>m.saved===M.saved);if(i>=0)DB.matches[i]=c;else DB.matches.unshift(c);commit();toast('Partido guardado');};
 $('btnCopy').onclick=()=>{if(placed().length<10){toast('Completá los 10 primero.');return;}const F=FORMS[M.form];
