@@ -345,8 +345,8 @@ $('btnOther').onclick=()=>{if(placed().length!==10)return;if(!opts.length)opts=c
 const mineOf=id=>VOTACION_ABIERTA&&ME.prof&&ME.prof[id];
 function shown(id,k){const m=mineOf(id);if(m&&typeof m[k]==='number')return{v:m[k]+3,st:'mine'};const pr=profOf(id);if(hasAvg(pr,k))return{v:pr[k]+3,st:'avg'};return{v:3,st:'none'};}
 function shownPos(id){const m=mineOf(id);if(m)return{p:POS_S.some(x=>x[0]===m.pos)?m.pos:'ANY',st:'mine'};const c=consensus(id),ok=c&&POS_S.some(x=>x[0]===c.pos);return{p:ok?c.pos:'ANY',st:ok?'avg':'none'};}
-function metaOf(p){if(p.custom)return['invitado',''];if(!VOTACION_ABIERTA)return['La votación arranca pronto',''];if(p.id===ME.who)return['sos vos',''];if(mineOf(p.id))return['✓ tu opinión','ok'];
-  const pr=profOf(p.id);return[pr?`${pr.n} ${pr.n===1?'opinión':'opiniones'}`:'sin calificar',''];}
+function metaOf(p){if(p.custom)return['invitado',''];if(!VOTACION_ABIERTA)return['La votación arranca pronto',''];const pr=profOf(p.id),n=pr?pr.n:0,cnt=n?`${n} ${n===1?'voto':'votos'}`:'sin votos';
+  if(p.id===ME.who)return[`sos vos · ${cnt}`,''];if(mineOf(p.id))return[`✓ votaste · ${cnt}`,'ok'];return[cnt,''];}
 const fmt1=v=>String(Math.round(v*10)/10).replace('.',',');
 /* Una barrita, dos valores: el relleno y la marca = promedio del grupo; la perilla = tu voto (hueca si todavía no votaste). */
 function slInfo(id,k){const m=mineOf(id),pr=profOf(id),my=m&&typeof m[k]==='number'&&(!m._t||m._t[k])?m[k]+3:null,av=hasAvg(pr,k)?pr[k]+3:null;
