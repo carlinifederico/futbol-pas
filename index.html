@@ -60,6 +60,8 @@ button,select,input{font:inherit;color:inherit}
 .rows{display:flex;flex-direction:column;position:relative;z-index:0;isolation:isolate}
 .row{display:grid;grid-template-columns:72px minmax(0,1fr);gap:10px;align-items:start;padding:6px 4px 5px 2px;border-bottom:1px solid rgba(27,33,64,.13);border-left:4px solid transparent}
 .row.on{background:var(--ok-bg);border-left-color:var(--ok)}
+.fc{display:flex;flex-direction:column;align-items:center;gap:7px}
+.avg{font-size:10.5px;color:var(--ink-soft);white-space:nowrap}.avg b{font-weight:700;color:var(--ink)}
 .face{position:relative;width:72px;height:85px;padding:0;border:2px solid var(--ink);border-radius:4px;background:#fff;cursor:pointer;overflow:visible;box-shadow:2px 2px 0 rgba(27,33,64,.25);transform:rotate(-1.5deg)}
 .row:nth-child(even) .face{transform:rotate(1.5deg)}
 .row:not(.vot) .face{width:52px;height:62px}
@@ -364,7 +366,7 @@ function slHTML(id,k,full,name,off){const o=slInfo(id,k);
   return `<div class="${o.cls}" data-sl="${id}" data-k="${k}" role="slider" tabindex="${off?-1:0}"${off?' aria-disabled="true"':''} aria-label="${full} de ${esc(name)}" aria-valuemin="1" aria-valuemax="5" aria-valuenow="${Math.round(o.t)}" aria-valuetext="${o.full}" style="--t:${(o.t-1)/4};--a:${o.av!=null?(o.av-1)/4:0}${o.my!=null?';--hue:'+hueOf(o.my):''}"><span class="lb">${full}<b>${off?'':o.short}</b></span><span class="tr"><i></i><u></u><u></u><u></u><u></u><u></u><s></s><em>${o.my??''}</em><b>${o.full}</b></span></div>`;}
 function rowHTML(p){const on=isSel(p.id),me=p.id===ME.who,cu=!!p.custom,ctl=!cu&&!me,off=!VOTACION_ABIERTA,sp=shownPos(p.id),[mt,mc]=metaOf(p);
   return `<div class="row${on?' on':''}${ctl?' vot':''}" data-row="${p.id}">
-   <button type="button" class="face" data-pick="${p.id}" aria-pressed="${on}" aria-label="${esc(p.name)}: juega">${cardThumb(p)}<span class="ck">✓</span></button>
+   <div class="fc"><button type="button" class="face" data-pick="${p.id}" aria-pressed="${on}" aria-label="${esc(p.name)}: juega">${cardThumb(p)}<span class="ck">✓</span></button>${cu?'':`<span class="avg" data-avg="${p.id}">${avgTxt(p.id)}</span>`}</div>
    <div class="rm"><div class="rt"><button type="button" class="nm" data-pick="${p.id}" tabindex="-1"><span>${esc(p.name)}</span><small class="${mc}">${mt}</small></button>
     ${cu?`<button type="button" class="rmv" data-rm="${p.id}" aria-label="Quitar a ${esc(p.name)}">✕</button>`:''}</div>
     ${ctl?`<div class="ctl${off?' off':''}"><span class="cl" id="pl-${p.id}">Posición</span><span class="pos" role="group" aria-labelledby="pl-${p.id}">${POS_S.map(([k,l])=>`<button type="button" data-pos="${p.id}" data-p="${k}" aria-pressed="${!off&&sp.p===k}" class="${sp.st}"${off?' disabled':''}>${l}</button>`).join('')}</span>
@@ -378,10 +380,11 @@ function renderList(){if(SL){listDirty=true;return;}listDirty=false;$('soy').par
   $('rows').innerHTML=rankedList().map(rowHTML).join('');
   if(anc){const r=document.querySelector(`[data-row="${anc.id}"]`);if(r)L.scrollTop+=r.getBoundingClientRect().top-anc.top;}}
 /* ranking: primero el de mayor puntaje promedio; los que no tienen votos, al final; los invitados, abajo de todo */
+function avgTxt(id){const pr=profOf(id);return pr&&ATTRS.some(([k])=>attrN(pr,k))?`prom. <b>${score(id).toFixed(2).replace('.',',')}</b>`:'sin prom.';}
 function rankedList(){const has=id=>{const pr=profOf(id);return !!pr&&ATTRS.some(([k])=>attrN(pr,k));};
   return ROSTER.slice().sort((a,b)=>(has(b.id)-has(a.id))||(score(b.id)-score(a.id))||a.name.localeCompare(b.name)).concat(DB.custom);}
 /* Actualiza una fila sin rearmarla (no corta el arrastre de la barrita) */
-function updateRow(id){const r=document.querySelector(`[data-row="${id}"]`),p=P(id);if(!r||!p)return;const on=isSel(id);
+function updateRow(id){const r=document.querySelector(`[data-row="${id}"]`),p=P(id);if(!r||!p)return;const av=r.querySelector('[data-avg]');if(av)av.innerHTML=avgTxt(id);const on=isSel(id);
   r.classList.toggle('on',on);r.querySelector('.face').setAttribute('aria-pressed',on);
   const[mt,mc]=metaOf(p),sm=r.querySelector('.nm small');sm.textContent=mt;sm.className=mc;if(!VOTACION_ABIERTA)return;
   r.querySelectorAll('[data-sl]').forEach(el=>{const o=slInfo(id,el.dataset.k),keep=['drag','show','tick','set'].filter(c=>el.classList.contains(c));el.className=o.cls+(keep.length?' '+keep.join(' '):'');slApply(el,o);});
