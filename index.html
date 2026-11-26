@@ -166,7 +166,7 @@ dialog .dbar .btn.primary{flex:1}
 <script>
 /* VOTACIÓN: en false no se lee, muestra ni manda ninguna calificación (todo vacío; el armador usa solo los puntajes base).
    Poner en true cuando arranque la votación. */
-const VOTACION_ABIERTA=false;
+const VOTACION_ABIERTA=true;
 /* RESET: cambiar este valor borra, una sola vez en cada teléfono, todos los datos guardados (votos, selección, equipos, invitados, avisos). */
 const RESET_ID='2026-11-26a';
 try{if(localStorage.getItem('pas-reset')!==RESET_ID){['pas-votos-v1','pas-armador-v2','pas-tip-v3','pas-tip-v4','pas-tip-v4c'].forEach(k=>localStorage.removeItem(k));localStorage.setItem('pas-reset',RESET_ID);}}catch(e){}
@@ -354,7 +354,7 @@ function toggle(id){if(isSel(id)){M.sel.splice(M.sel.indexOf(id),1);const w=wher
 function setMine(id,patch){if(!VOTACION_ABIERTA)return;ME.prof=ME.prof||{};let m=ME.prof[id];
   if(!m){m={};for(const[k]of ATTRS)m[k]=Math.max(-2,Math.min(2,Math.round(shown(id,k).v)-3));m.pos=shownPos(id).p;ME.prof[id]=m;}
   else if(Object.keys(patch).every(k=>m[k]===patch[k]))return;
-  if(!m._t)m._t={};for(const k in patch)m._t[k]=1;Object.assign(m,patch);ME.pDirty=true;ME.pending=true;vsave();scheduleSync(1500);updateRow(id);syncUI();}
+  if(!m._t)m._t={};for(const k in patch)m._t[k]=1;Object.assign(m,patch);editSeq++;ME.pDirty=true;ME.pending=true;vsave();scheduleSync(1500);updateRow(id);syncUI();}
 let bubT=null;function bub(el){document.querySelectorAll('.sl.show').forEach(x=>x!==el&&x.classList.remove('show'));el.classList.add('show');clearTimeout(bubT);bubT=setTimeout(()=>el.classList.remove('show'),1800);}
 function slSet(el,x){bub(el);const tr=el.querySelector('.tr').getBoundingClientRect(),v=Math.max(1,Math.min(5,1+Math.round((x-tr.left-14)/Math.max(1,tr.width-28)*4)));setMine(el.dataset.sl,{[el.dataset.k]:v-3});}
 const rows=$('rows');
@@ -440,14 +440,16 @@ function vsave(){try{localStorage.setItem(VK,JSON.stringify({me:ME,vs:VS}));}cat
 function refresh(){renderTop();renderList();}
 async function fetchVotes(){if(!VOTACION_ABIERTA||!VOTE_URL)return;try{const r=await fetch(VOTE_URL);const d=await r.json();if(d&&d.players){const same=JSON.stringify(d)===JSON.stringify(VS);VS=d;if(!same){vsave();refresh();}}}catch(e){}}
 /* Guardado automático: se manda sola unos segundos después; si no hay señal, queda pendiente y se reintenta. */
-let syncTimer=null,syncing=false,syncFails=0,syncState='';
+let syncTimer=null,syncing=false,syncFails=0,syncState='',editSeq=0;
 function scheduleSync(ms){clearTimeout(syncTimer);syncTimer=setTimeout(syncVotes,ms);}
 async function syncVotes(){if(!VOTACION_ABIERTA||!VOTE_URL||!ME.pending)return;if(syncing){scheduleSync(1200);return;}
   const votes={},profile={};if(ME.pDirty)for(const k in ME.prof||{})if(k!==ME.who&&P(k)&&!P(k).custom){const{_t,...o}=ME.prof[k];profile[k]=o;}
   if(!Object.keys(profile).length){ME.pending=false;vsave();syncUI();return;}
-  syncing=true;syncState='saving';syncUI();
+  syncing=true;syncState='saving';syncUI();const seq=editSeq;
   try{const r=await fetch(VOTE_URL,{method:'POST',body:JSON.stringify({voter:ME.id,who:ME.who||'',votes,profile})});const d=await r.json();
-    if(d&&d.players){VS=d;refresh();}ME.pDirty=false;ME.sent=true;ME.pending=false;syncFails=0;syncState='ok';vsave();}
+    if(!d||!d.players)throw new Error('respuesta inválida');VS=d;ME.sent=true;syncFails=0;
+    /* si se movió algo mientras se mandaba, queda pendiente y se manda de nuevo */
+    if(seq===editSeq){ME.pDirty=false;ME.pending=false;syncState='ok';}else scheduleSync(1500);vsave();refresh();}
   catch(e){syncFails++;syncState='retry';scheduleSync(Math.min(60000,4000*syncFails));}
   finally{syncing=false;syncUI();}}
 window.addEventListener('online',()=>{if(ME.pending)scheduleSync(500);});
