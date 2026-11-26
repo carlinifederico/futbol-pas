@@ -140,7 +140,7 @@ dialog form{padding:16px;display:flex;flex-direction:column;gap:12px}
 .seg button[aria-pressed="true"]{background:var(--ink);color:var(--mustard)}
 .seg.tr button[aria-pressed="true"]{background:var(--celeste);color:var(--ink)}
 .sliders{display:flex;flex-direction:column;gap:10px;background:#fff;border:2px solid var(--ink);padding:10px 12px}
-.sl{display:grid;grid-template-columns:78px minmax(0,1fr) 78px;gap:8px;align-items:center}
+.sl{display:grid;grid-template-columns:90px minmax(0,1fr);gap:8px;align-items:center}
 .sl-l,.sl-r{font-family:var(--type);font-size:12px;font-weight:700}.sl-r{text-align:right}
 .sl input{width:100%;accent-color:var(--red);height:26px}
 .les{display:flex;gap:8px;align-items:center;font-family:var(--type);font-size:13.5px;font-weight:700;text-transform:none;letter-spacing:0;margin-top:6px}
@@ -164,14 +164,12 @@ body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset
 .ipos{display:grid;grid-template-columns:repeat(4,1fr);gap:2px}
 .ipos button{font-family:var(--type);font-size:10.5px;font-weight:700;padding:2px 0;border:1.5px solid var(--ink);background:#fff;color:var(--ink);cursor:pointer}
 .ipos button[aria-pressed="true"]{background:var(--ink);color:var(--mustard)}
-.iattrs{display:grid;grid-template-columns:1fr 1fr;gap:3px}
-.ia{display:grid;grid-template-columns:16px minmax(0,1fr) 16px;align-items:center;border:1.5px solid var(--ink-soft);background:#fff;min-height:24px}
-.ia span{font-family:var(--type);font-size:10.5px;font-weight:700;text-align:center;line-height:1.05;color:var(--ink-soft);overflow-wrap:anywhere}
-.ia.up{background:#d6e8f6;border-color:var(--ink)}.ia.down{background:#f0d2cc;border-color:var(--ink)}
-.ia.up span,.ia.down span{color:var(--ink)}
-.ia button{background:none;border:0;padding:0;height:100%;font-family:var(--display);font-size:16px;color:var(--ink);cursor:pointer}
-.ia button:disabled{opacity:.25;cursor:default}
-.ia button:focus-visible,.ipos button:focus-visible{outline:2px dashed var(--red);outline-offset:1px}
+.iattrs{display:grid;grid-template-columns:1fr 1fr;gap:2px 8px}
+.ia{display:flex;flex-direction:column;gap:0;cursor:pointer}
+.ia span{font-family:var(--type);font-size:10px;font-weight:700;color:var(--ink-soft);text-transform:uppercase;letter-spacing:.03em}
+.ia input{width:100%;height:16px;margin:0;accent-color:var(--ink);cursor:pointer}
+.ia input:focus-visible{outline:2px dashed var(--red);outline-offset:1px}
+.ipos button:focus-visible{outline:2px dashed var(--red);outline-offset:1px}
 .iles{display:flex;gap:6px;align-items:center;font-family:var(--type);font-size:11.5px;font-weight:700;cursor:pointer}
 .iles input{width:16px;height:16px;accent-color:var(--red)}
 .bcard .novote{font-family:var(--type);font-size:11px;color:var(--ink-soft)}
@@ -280,7 +278,7 @@ body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset
     <section class="col plantel" aria-label="Plantel">
       <div class="benchbox" id="benchbox" data-drop="bench">
         <div class="bar" style="justify-content:space-between"><span class="stephead"><span class="num">1</span>¿Quiénes juegan?</span><span class="cnt" id="count"></span></div>
-        <p class="hint" style="margin:0">Tocá las figuritas de los 10 que juegan (otra vez para sacarlos). Debajo de cada una cambiás su posición y cómo juega, ahí mismo. Después tocá <b>Armar parejos</b>.</p>
+        <p class="hint" style="margin:0">Tocá las figuritas de los 10 que juegan (otra vez para sacarlos). Debajo de cada una ajustás su posición y los deslizadores de velocidad, físico, precisión y aguante. Después tocá <b>Armar parejos</b>.</p>
         <span class="convlbl">CONVOCADOS (tocá una cara para sacarlo)</span>
         <div class="conv" id="conv"></div>
         <div class="bench" id="bench"></div>
@@ -317,7 +315,7 @@ body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset
     <h2 style="font-family:var(--display);font-weight:400;font-size:34px;text-transform:uppercase;margin:0;line-height:1">Bienvenido a Fútbol PAS</h2>
     <ol class="gsteps">
       <li><span class="n">1</span><div><b>Votá a tus compañeros</b><p>Primero, en "Votar", ponele de 1 a 5 estrellas a cada uno. Es secreto. Sin estrellas el sistema no sabe quién es quién, así que esto es lo que hace que los equipos salgan parejos.</p></div></li>
-      <li><span class="n">2</span><div><b>Convocá a los 10</b><p>En "Armar partido", tocá las figuritas de los que juegan. Debajo de cada una ves sus estrellas. Debajo de cada una cambiás ahí mismo su posición y cómo juega (velocidad, físico, precisión, aguante y si viene tocado).</p></div></li>
+      <li><span class="n">2</span><div><b>Convocá a los 10</b><p>En "Armar partido", tocá las figuritas de los que juegan. Debajo de cada una ves sus estrellas. Debajo de cada una ajustás ahí mismo su posición y, con deslizadores chiquitos, velocidad, físico, precisión y aguante.</p></div></li>
       <li><span class="n">3</span><div><b>Armar parejos</b><p>El botón amarillo reparte a los 10 en remera oscura y remera clara, mirando estrellas, posición y perfil. La barra de balance te muestra qué tan parejo quedó. ¿No te gusta? "Otra opción" o arrastrá figuritas.</p></div></li>
       <li><span class="n">4</span><div><b>Compartí la cancha</b><p>Con "Compartir imagen" la mandás al grupo de WhatsApp.</p></div></li>
     </ol>
@@ -329,8 +327,7 @@ body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset
   <form method="dialog" id="detFrm">
     <div class="dhead"><div class="mini" id="dMini"></div><div><h2 id="dName"></h2><p class="hint" id="dWhere" style="margin:4px 0 0"></p></div></div>
     <div class="f"><span class="lbl">Posición</span><div class="seg" id="dPos"></div></div>
-    <div class="f"><span class="lbl">Cómo juega</span><div class="sliders" id="dTr"></div>
-      <label class="les"><input type="checkbox" id="dLes"> Medio lesionado / viene tocado</label></div>
+    <div class="f"><span class="lbl">Cómo juega</span><div class="sliders" id="dTr"></div></div>
     <div class="f" id="dLvlWrap"><span class="lbl">Nivel</span><div class="seg" id="dLvl"></div></div>
     <div class="bar" style="justify-content:space-between"><button type="button" class="btn small" id="dOut">Sacar de la cancha</button><button class="btn primary small">Listo</button></div>
   </form>
@@ -425,7 +422,7 @@ const members=k=>[M[k].gk,...M[k].s].filter(Boolean);
 /* ---------- Valores ocultos ---------- */
 function base(p){const v=VS.players&&VS.players[p.id];if(!v||!v.c)return p.r;const avg=v.s/v.c;return (p.r*3+avg*v.c)/(3+v.c);}
 function val(id){const p=P(id);if(!p)return 0;const d=det(id);let v=p.custom?parseFloat(d.lvl||'5.5'):base(p);
-  for(const[k]of ATTRS)v+=0.15*(d[k]||0);if(d.les)v-=0.7;return v;}
+  for(const[k]of ATTRS)v+=0.15*(d[k]||0);return v;}
 function teamVal(k){const t=M[k];return (t.gk?val(t.gk):0)+t.s.reduce((a,id)=>a+(id?val(id):0),0);}
 function verdictOf(d){return d<=1?['Muy parejo','#6fd08e']:d<=2.5?['Parejo','#e2b93b']:['Desparejo','#f08a80'];}
 
@@ -441,7 +438,7 @@ function computeOpts(pl){const first=pl[0],rest=pl.slice(1),hasDef=pl.some(id=>p
   for(const c of combos(rest,4)){const A=[first,...c],B=pl.filter(id=>!A.includes(id));let pen=0,v=[];
     for(const T of[A,B]){const g=pickGk(T),field=T.filter(id=>id!==g);v.push(T.reduce((a,id)=>a+val(id),0));
       if(hasDef&&!field.some(id=>posOf(id)==='DEF'))pen+=1;if(hasDel&&!field.some(id=>posOf(id)==='DEL'))pen+=.6;
-      if(T.filter(id=>det(id).les).length>1)pen+=.8;}
+      }
     /* que no quede todo lo rápido (o todo lo fuerte, preciso…) de un mismo lado */
     for(const[k]of ATTRS){const sa=A.reduce((x,id)=>x+(det(id)[k]||0),0),sb=B.reduce((x,id)=>x+(det(id)[k]||0),0);pen+=0.3*Math.abs(sa-sb);}
     res.push({A,B,score:Math.abs(v[0]-v[1])*2+pen});}
@@ -520,8 +517,7 @@ function attrTxt(k,v){const a=ATTRS.find(x=>x[0]===k);if(!v)return a[1];return (
 function inlHTML(id){const d=det(id);
   return `<div class="inl" data-inl="${id}">
     <div class="ipos" role="group" aria-label="Posición">${POS_S.map(([k,l])=>`<button type="button" data-ip="${k}" aria-pressed="${d.pos===k}">${l}</button>`).join('')}</div>
-    <div class="iattrs">${ATTRS.map(([k,l])=>{const v=d[k]||0;return `<div class="ia ${v>0?'up':v<0?'down':''}"><button type="button" data-ia="${k}" data-d="-1" aria-label="${l}: menos" ${v<=-2?'disabled':''}>‹</button><span title="${l}">${attrTxt(k,v)}</span><button type="button" data-ia="${k}" data-d="1" aria-label="${l}: más" ${v>=2?'disabled':''}>›</button></div>`;}).join('')}</div>
-    <label class="iles"><input type="checkbox" data-il="1" ${d.les?'checked':''}> Viene tocado</label></div>`;}
+    <div class="iattrs">${ATTRS.map(([k,l])=>`<label class="ia"><span>${l}</span><input type="range" min="-2" max="2" step="1" value="${d[k]||0}" data-ia="${k}" aria-label="${l}"></label>`).join('')}</div></div>`;}
 function chipsOf(id){const d=M.det[id];if(!d)return '';fixDet(d);const c=[];
   if(d.pos&&d.pos!=='ANY')c.push(`<span class="pchip">${POS.find(x=>x[0]===d.pos)[1]}</span>`);
   for(const[k,,lo,hi]of ATTRS)if(d[k])c.push(`<span class="pchip ${d[k]>0?'pos':'neg'}">${d[k]>0?hi:lo}${Math.abs(d[k])>1?'+':''}</span>`);
@@ -577,22 +573,22 @@ function tap(id,src){if(src.classList.contains('mk')){openDet(id);return;}
 
 /* ---------- Edición en la tarjeta ---------- */
 $('bench').addEventListener('click',e=>{const box=e.target.closest('[data-inl]');if(!box)return;const id=box.dataset.inl,d=det(id);
-  const bp=e.target.closest('[data-ip]'),ba=e.target.closest('[data-ia]');
-  if(bp)d.pos=bp.dataset.ip;else if(ba){d[ba.dataset.ia]=Math.max(-2,Math.min(2,(d[ba.dataset.ia]||0)+(+ba.dataset.d)));}else return;
-  e.stopPropagation();opts=[];save();renderMeter();box.outerHTML=inlHTML(id);});
+  const bp=e.target.closest('[data-ip]');if(!bp)return;d.pos=bp.dataset.ip;
+  e.stopPropagation();opts=[];save();renderMeter();box.querySelectorAll('[data-ip]').forEach(x=>x.setAttribute('aria-pressed',x===bp));});
+$('bench').addEventListener('input',e=>{const r=e.target.closest('[data-ia]');if(!r)return;const id=r.closest('[data-inl]').dataset.inl;det(id)[r.dataset.ia]=+r.value;opts=[];save();renderMeter();});
 $('bench').addEventListener('change',e=>{const c=e.target.closest('[data-il]');if(!c)return;const id=c.closest('[data-inl]').dataset.inl;det(id).les=c.checked;opts=[];save();renderMeter();});
 /* ---------- Detalles ---------- */
 function openDet(id){detId=id;const p=P(id),d=det(id),w=where(id);
   $('dMini').innerHTML=figHTML(p);$('dName').textContent=p.name;$('dWhere').textContent=w?`En ${TEAM[w.k].name} · ${w.s<0?'Arquero':FORMS[fm(w.k)][w.s].l}`:'En el plantel';
   $('dPos').innerHTML=POS.map(([k,l])=>`<button type="button" data-p="${k}" aria-pressed="${d.pos===k}">${l}</button>`).join('');
-  $('dTr').innerHTML=ATTRS.map(([k,l,lo,hi])=>`<div class="sl"><span class="sl-l">${lo}</span><input type="range" min="-2" max="2" step="1" value="${d[k]||0}" id="sl-${k}" data-a="${k}" aria-label="${l}: de ${lo} a ${hi}" list="ticks"><span class="sl-r">${hi}</span></div>`).join('');
-  $('dLes').checked=!!d.les;
+  $('dTr').innerHTML=ATTRS.map(([k,l,lo,hi])=>`<div class="sl"><span class="sl-l">${l}</span><input type="range" min="-2" max="2" step="1" value="${d[k]||0}" id="sl-${k}" data-a="${k}" aria-label="${l}" list="ticks"></div>`).join('');
+
   $('dLvlWrap').hidden=!p.custom;$('dLvl').innerHTML=LEVELS.map(([k,l])=>`<button type="button" data-l="${k}" aria-pressed="${d.lvl===k}">${l}</button>`).join('');
   $('dOut').hidden=!w;$('detDlg').showModal();}
 $('dPos').onclick=e=>{const b=e.target.closest('[data-p]');if(!b)return;det(detId).pos=b.dataset.p;opts=[];
   $('dPos').querySelectorAll('button').forEach(x=>x.setAttribute('aria-pressed',x===b));commit();};
 $('dTr').addEventListener('input',e=>{const r=e.target.closest('[data-a]');if(!r)return;det(detId)[r.dataset.a]=+r.value;opts=[];commit();});
-$('dLes').onchange=e=>{det(detId).les=e.target.checked;opts=[];commit();};
+
 $('dLvl').onclick=e=>{const b=e.target.closest('[data-l]');if(!b)return;det(detId).lvl=b.dataset.l;$('dLvl').querySelectorAll('button').forEach(x=>x.setAttribute('aria-pressed',x===b));opts=[];commit();};
 $('dOut').onclick=()=>{removeFromPitch(detId);$('detDlg').close();};
 
