@@ -88,17 +88,19 @@ button,select,input{font:inherit;color:inherit}
 .sl .lb b{font-size:10.5px;color:var(--ink);min-width:1ch;text-align:right;white-space:nowrap}
 .sl .tr{position:relative;height:30px}
 .sl .tr::before{content:"";position:absolute;left:calc(var(--th)/2);right:calc(var(--th)/2);top:50%;height:8px;margin-top:-4px;border-radius:4px;background:rgba(27,33,64,.16)}
-.sl .tr i{position:absolute;left:calc(var(--th)/2);right:calc(var(--th)/2);top:50%;height:8px;margin-top:-4px;border-radius:4px;background:linear-gradient(90deg,#f2c94c,#3fae5a);clip-path:inset(0 calc((1 - var(--a))*100%) 0 0 round 4px)}
-.sl .tr s{position:absolute;top:50%;left:calc(var(--th)/2 + (100% - var(--th))*var(--a));width:3px;height:18px;margin:-9px 0 0 -1.5px;border-radius:2px;background:var(--ink)}
+.sl .tr i{position:absolute;left:calc(var(--th)/2);right:calc(var(--th)/2);top:50%;height:8px;margin-top:-4px;border-radius:4px;background:linear-gradient(90deg,#f2c94c,#3fae5a);opacity:.5;filter:saturate(.6);clip-path:inset(0 calc((1 - var(--a))*100%) 0 0 round 4px);transition:clip-path .4s}
+.sl.mine .tr::after{content:"";position:absolute;z-index:1;left:calc(var(--th)/2);right:calc(var(--th)/2);top:50%;height:8px;margin-top:-4px;border-radius:4px;background:linear-gradient(90deg,#f2c94c,#3fae5a);clip-path:inset(0 calc((1 - var(--t))*100%) 0 0 round 4px)}
+.sl.mine:not(.drag) .tr::after{transition:clip-path .12s}
+.sl .tr s{position:absolute;z-index:2;top:50%;left:calc(var(--th)/2 + (100% - var(--th))*var(--a));width:3px;height:16px;margin:-8px 0 0 -1.5px;border-radius:2px;background:rgba(27,33,64,.6);transition:left .4s}
 .sl.noavg .tr i,.sl.noavg .tr s{display:none}
 .sl .tr u{position:absolute;top:50%;width:4px;height:4px;margin:-2px 0 0 -2px;border-radius:50%;background:rgba(27,33,64,.45)}
 .sl .tr u:nth-of-type(1){left:calc(var(--th)/2)}.sl .tr u:nth-of-type(2){left:calc(var(--th)/2 + (100% - var(--th))*.25)}.sl .tr u:nth-of-type(3){left:50%}
 .sl .tr u:nth-of-type(4){left:calc(var(--th)/2 + (100% - var(--th))*.75)}.sl .tr u:nth-of-type(5){left:calc(100% - var(--th)/2)}
 .sl .tr em{position:absolute;top:50%;left:calc(var(--th)/2 + (100% - var(--th))*var(--t));width:var(--th);height:var(--th);margin:calc(var(--th)/-2) 0 0 calc(var(--th)/-2);border-radius:50%;transition:transform .12s,left .12s;
   background:rgba(255,255,255,.55);border:2px dashed rgba(27,33,64,.55)}
-.sl .tr em{display:grid;place-items:center;font:700 12px/1 var(--body);color:#fff}
+.sl .tr em{z-index:3;display:grid;place-items:center;font:700 12px/1 var(--body);color:#fff}
 .sl.mine .tr em{background:hsl(var(--hue,90) 60% 36%);border:2px solid #fff;box-shadow:0 0 0 2px hsl(var(--hue,90) 60% 26%),0 2px 5px rgba(0,0,0,.3);transition:transform .12s,left .12s,background-color .15s}
-.sl.mine .lb b{color:hsl(var(--hue,90) 60% 28%)}
+.sl .lb b{font-weight:500;color:var(--ink-soft)}
 .sl.drag .tr em{box-shadow:0 0 0 2px hsl(var(--hue,90) 60% 26%),0 0 0 9px hsl(var(--hue,90) 70% 45% / .22),0 3px 8px rgba(0,0,0,.3)}
 @keyframes sltick{0%{transform:scale(1.3)}45%{transform:scale(1.6)}100%{transform:scale(1.3)}}
 .sl.drag.tick .tr em{animation:sltick .2s ease-out}
@@ -335,7 +337,7 @@ const fmt1=v=>String(Math.round(v*10)/10).replace('.',',');
 /* Una barrita, dos valores: el relleno y la marca = promedio del grupo; la perilla = tu voto (hueca si todavía no votaste). */
 function slInfo(id,k){const m=mineOf(id),pr=profOf(id),my=m&&typeof m[k]==='number'&&(!m._t||m._t[k])?m[k]+3:null,av=hasAvg(pr,k)?pr[k]+3:null;
   return{my,av,t:my??av??3,cls:'sl '+(my!=null?'mine':'ghost')+(av!=null?'':' noavg'),
-    short:my!=null?(av!=null?`vos ${my} · ${fmt1(av)}`:`vos ${my}`):(av!=null?fmt1(av):''),
+    short:av!=null?`grupo ${fmt1(av)}`:'',
     full:[my!=null?`tu voto ${my}`:'',av!=null?`promedio ${fmt1(av)}`:''].filter(Boolean).join(' · ')||'sin votos'};}
 const hueOf=v=>45+(v-1)*22.5;
 function slApply(el,o){el.style.setProperty('--t',(o.t-1)/4);if(o.my!=null)el.style.setProperty('--hue',hueOf(o.my));el.querySelector('.tr em').textContent=o.my??'';el.style.setProperty('--a',o.av!=null?(o.av-1)/4:0);el.querySelector('.lb b').textContent=o.short;el.querySelector('.tr b').textContent=o.full;
@@ -412,8 +414,8 @@ $('addFrm').addEventListener('submit',e=>{e.preventDefault();const name=$('aName
   const p={id:'c'+Date.now().toString(36),name,custom:true};DB.custom.push(p);$('aName').value='';save();renderList();if(M.sel.length<10)toggle(p.id);toast(`${name} sumado`);});
 
 /* Tip de una sola vez */
-const TIPK=VOTACION_ABIERTA?'pas-tip-v5':'pas-tip-v4c';
-$('tipT').innerHTML=VOTACION_ABIERTA?'<b>Votá</b> moviendo las barritas y la posición de cada uno: es secreto y se guarda solo. <b>Tocá la figurita</b> de los 10 que juegan.':'Tocá las caras de los 10 que juegan. La votación arranca pronto.';
+const TIPK=VOTACION_ABIERTA?'pas-tip-v6':'pas-tip-v4c';
+$('tipT').innerHTML=VOTACION_ABIERTA?'<b>Votá</b> arrastrando las barritas: la perilla de color es tu voto y lo clarito, el promedio del grupo. Es secreto y se guarda solo. <b>Tocá la figurita</b> de los 10 que juegan.':'Tocá las caras de los 10 que juegan. La votación arranca pronto.';
 try{$('tip').hidden=!!localStorage.getItem(TIPK);}catch(e){$('tip').hidden=false;}
 $('tipX').onclick=()=>{$('tip').hidden=true;try{localStorage.setItem(TIPK,'1');}catch(e){}};
 
