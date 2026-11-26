@@ -10,6 +10,6 @@ git commit -q -m "${1:-Actualización}
 
 Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>" || true
 git push -q
-T=$(mktemp -d); mkdir -p "$T/figus/web"; cp index.html og.jpg "$T/"; cp figus/web/*.jpg "$T/figus/web/"
+T=$(mktemp -d); mkdir -p "$T/figus/web"; cp index.html og.jpg _headers "$T/"; cp figus/web/*.jpg "$T/figus/web/"
 (cd "$T" && npx -y wrangler@3 pages deploy . --project-name futbolpas --branch main --commit-dirty=true | tail -2)
 rm -rf "$T"
