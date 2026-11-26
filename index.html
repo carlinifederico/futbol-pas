@@ -138,6 +138,8 @@ dialog h2{font-family:var(--display);font-weight:400;font-size:24px;text-transfo
 dialog .dbar .btn.primary{flex:1}
 /* formación de cada equipo, sobre su mitad de la cancha */
 .fsel{position:absolute;bottom:var(--fy,0px);z-index:2;display:flex;align-items:center;height:36px;border:2px solid var(--ink);border-radius:6px;overflow:hidden;font-family:var(--display);font-size:14px;letter-spacing:.02em;text-transform:uppercase;box-shadow:2px 2px 0 rgba(0,0,0,.3)}
+.clr{position:absolute;z-index:3;top:var(--fy,0px);right:var(--fx,0px);width:34px;height:34px;border-radius:50%;border:2px solid var(--ink);background:var(--chalk);color:var(--ink);font-size:16px;font-weight:700;line-height:1;cursor:pointer;box-shadow:2px 2px 0 rgba(0,0,0,.3)}
+.clr:active{transform:translate(2px,2px);box-shadow:none}
 .fsel.a{left:var(--fx,0px);background:var(--navy-shirt);color:var(--chalk)}
 .fsel.b{right:var(--fx,0px);background:var(--white-shirt);color:var(--ink)}
 .fsel span{padding:0 2px 0 8px;pointer-events:none}
@@ -154,6 +156,7 @@ dialog .dbar .btn.primary{flex:1}
 <div class="app">
   <section class="top" aria-label="Cancha">
     <div class="pitch"><svg id="pitch" viewBox="0 0 520 420" role="img" aria-label="Cancha con los dos equipos"></svg>
+      <button type="button" class="clr" id="btnClr" aria-label="Limpiar cancha" title="Limpiar cancha" hidden>✕</button>
       <label class="fsel a"><span>Oscuros</span><select id="formA" aria-label="Formación de Oscuros"></select></label>
       <label class="fsel b"><span>Claros</span><select id="formB" aria-label="Formación de Claros"></select></label></div>
     <div class="bal" aria-live="polite"><div class="track"><i class="a" id="barA"></i><i class="b" id="barB"></i></div><span class="verd" id="verd">—</span></div>
@@ -261,7 +264,8 @@ const fit=(id,t)=>{const p=posOf(id);return !p?1:(p===t?3:0);};
 function perms(a){if(a.length<=1)return[a];const o=[];a.forEach((x,i)=>perms(a.filter((_,j)=>j!==i)).forEach(r=>o.push([x,...r])));return o;}
 const fm=k=>M[k].form||M.form||'2-2';
 function bestSlots(ids,form){const F=FORMS[form];let best=null;for(const pm of perms(ids)){const s=pm.reduce((a,id,i)=>a+fit(id,F[i].t),0);if(!best||s>best.s)best={s,slots:pm};}return best.slots;}
-function pickGk(ids){const arq=ids.filter(id=>posOf(id)==='ARQ');if(arq.length)return [...arq].sort((a,b)=>val(b)-val(a))[0];const any=ids.filter(id=>!posOf(id));return [...(any.length?any:ids)].sort((a,b)=>val(a)-val(b))[0];}
+function pickGk(ids,r=0){const arq=ids.filter(id=>posOf(id)==='ARQ');const c=arq.length?arq:(ids.filter(id=>!posOf(id)).length?ids.filter(id=>!posOf(id)):ids);
+  const o=[...c].sort((a,b)=>val(a)-val(b)||(a<b?-1:1));return o[r%o.length];}
 function combos(arr,k,s=0,cur=[],out=[]){if(cur.length===k){out.push(cur.slice());return out;}for(let i=s;i<arr.length;i++){cur.push(arr[i]);combos(arr,k,i+1,cur,out);cur.pop();}return out;}
 function computeOpts(pl){const first=pl[0],rest=pl.slice(1),hasDef=pl.some(id=>posOf(id)==='DEF'),hasDel=pl.some(id=>posOf(id)==='DEL'),nArq=pl.filter(id=>posOf(id)==='ARQ').length,res=[];
   for(const c of combos(rest,4)){const A=[first,...c],B=pl.filter(id=>!A.includes(id));let pen=0,v=[];
@@ -271,7 +275,7 @@ function computeOpts(pl){const first=pl[0],rest=pl.slice(1),hasDef=pl.some(id=>p
     for(const[k]of ATTRS){const sa=A.reduce((x,id)=>x+attrOf(id,k),0),sb=B.reduce((x,id)=>x+attrOf(id,k),0);pen+=0.6*Math.abs(sa-sb);}
     res.push({A,B,score:Math.abs(v[0]-v[1])*2+pen});}
   return res.sort((a,b)=>a.score-b.score).slice(0,12);}
-function applyOpt(o){for(const[k,ids]of[['A',o.A],['B',o.B]]){const g=pickGk(ids);M[k].gk=g;M[k].s=bestSlots(ids.filter(id=>id!==g),fm(k));}}
+function applyOpt(o){for(const[k,ids]of[['A',o.A],['B',o.B]]){const g=pickGk(ids,optIdx);M[k].gk=g;M[k].s=bestSlots(ids.filter(id=>id!==g),fm(k));}}
 
 /* ---------- Cancha (apaisada: Oscuros a la izquierda, Claros a la derecha) ---------- */
 const PW=520,PH=420;
@@ -298,7 +302,8 @@ function slotSVG(k,s){const id=get(k,s),T=TEAM[k],{x,y,t}=slotXY(k,s),hot=pick&&
     <rect x="-29" y="-34" width="62" height="74" fill="#000" opacity=".25"/><rect x="-31" y="-37" width="62" height="74" fill="${T.frame}" stroke="#1b2140" stroke-width="1"/>${photo}
     <rect x="-27" y="15" width="54" height="5" fill="#74acdf"/><rect x="-27" y="20" width="54" height="8" fill="#fff"/><rect x="-27" y="28" width="54" height="5" fill="#74acdf"/>
     <text x="0" y="29.5" text-anchor="middle" font-family="${DISPLAY}" font-size="12.5" fill="#1b2140"${tl}>${esc(nm)}</text>
-    <g transform="translate(23 -36) scale(.34)"><path d="${SHIRT}" fill="${T.shirt}" stroke="#1b2140" stroke-width="4"/></g></g></g>`;}
+    <g transform="translate(23 -36) scale(.34)"><path d="${SHIRT}" fill="${T.shirt}" stroke="#1b2140" stroke-width="4"/></g>
+    <g class="rmx" data-rmx="${id}" role="button" aria-label="Sacar a ${esc(p.name)}"><circle cx="-30" cy="-36" r="15" fill="transparent"/><circle cx="-30" cy="-36" r="8.5" fill="#d6453a" stroke="#fff" stroke-width="2"/><path d="M-33.2 -39.2 l6.4 6.4 m0 -6.4 l-6.4 6.4" stroke="#fff" stroke-width="2.2" stroke-linecap="round"/></g></g></g>`;}
 function renderPitch(){let s=pitchBase();
   for(const k of['A','B']){s+=slotSVG(k,-1);FORMS[fm(k)].forEach((_,i)=>{s+=slotSVG(k,i);});}
   s+=`<g transform="translate(260 13)" pointer-events="none"><rect x="-46" y="-10" width="92" height="20" fill="#1b2140"/><text y="5.5" text-anchor="middle" font-family="${DISPLAY}" font-size="14" letter-spacing="1" fill="#f7f1de">FÚTBOL PAS</text></g>`;
@@ -312,18 +317,23 @@ function placeForms(){const box=$('pitch').parentNode,w=box.clientWidth,h=box.cl
 try{new ResizeObserver(placeForms).observe($('pitch').parentNode);}catch(e){addEventListener('resize',placeForms);}
 for(const k of['A','B'])$('form'+k).addEventListener('change',e=>{M[k].form=e.target.value;
   const f=M[k].s.filter(Boolean),sl=bestSlots(f,M[k].form);M[k].s=[...sl,...Array(4-sl.length).fill(null)];opts=[];pick=null;commit();});
-$('pitch').addEventListener('click',e=>{const g=e.target.closest('[data-team]');if(!g)return;const k=g.dataset.team,s=+g.dataset.slot,id=get(k,s);
+$('pitch').addEventListener('click',e=>{const x=e.target.closest('[data-rmx]');if(x){e.stopPropagation();pick=null;const id=x.dataset.rmx;if(isSel(id))toggle(id);else{const w=where(id);if(w)set(w.k,w.s,null);commit();}return;}
+  const g=e.target.closest('[data-team]');if(!g)return;const k=g.dataset.team,s=+g.dataset.slot,id=get(k,s);
   if(!pick){if(id){pick={k,s};renderPitch();}else if(!placed().length)toast(M.sel.length<10?'Primero elegí a los 10 abajo':'Tocá Armar parejos');return;}
   if(pick.k===k&&pick.s===s){pick=null;renderPitch();return;}
   const a=get(pick.k,pick.s);set(pick.k,pick.s,id);set(k,s,a);pick=null;opts=[];commit();});
 
 /* ---------- Arriba: balance y botones ---------- */
+$('btnClr').onclick=()=>{const was=M.sel.slice();M.sel=[];for(const k of['A','B']){M[k].gk=null;M[k].s=M[k].s.map(()=>null);}opts=[];pick=null;commit();was.forEach(updateRow);toast('Cancha limpia');};
+/* promedio real de cada equipo, en la misma escala de los votos (1 a 5) */
+function balInfo(){const na=members('A').length,nb=members('B').length,avA=na?teamVal('A')/na/2:0,avB=nb?teamVal('B')/nb/2:0;
+  const pa=na&&nb?Math.round(Math.max(15,Math.min(85,50+(avA-avB)*40))):50;return{avA,avB,pa};}
 function renderTop(){renderPitch();const n=placed().length,c=M.sel.length,a=teamVal('A'),b=teamVal('B');
-  const pa=n&&a+b>0?Math.round(a/(a+b)*100):50;$('barA').style.width=pa+'%';$('barB').style.width=(100-pa)+'%';
-  $('barA').textContent=n?`Oscuros ${pa}%`:'Oscuros';$('barB').textContent=n?`${100-pa}% Claros`:'Claros';
+  const{avA,avB,pa}=balInfo();$('barA').style.width=pa+'%';$('barB').style.width=(100-pa)+'%';
+  $('barA').textContent=members('A').length?`Oscuros ${fmt1(avA)}`:'Oscuros';$('barB').textContent=members('B').length?`${fmt1(avB)} Claros`:'Claros';
   const v=$('verd');if(n===10){const[l,cl]=verdictOf(Math.abs(a-b));v.textContent=l;v.className='verd '+cl;}else{v.textContent=n?`Faltan ${10-n}`:'—';v.className='verd';}
   $('btnAuto').disabled=c!==10;$('btnAuto').textContent=c===10?'⚖️ Armar parejos':c?`Faltan ${10-c}`:'Elegí 10 abajo';
-  $('btnOther').disabled=n!==10;$('btnImg').disabled=n!==10;
+  $('btnClr').hidden=!n&&!c;$('btnOther').disabled=n!==10;$('btnImg').disabled=n!==10;
   $('cnt').textContent=`${c}/10`;$('cnt').classList.toggle('full',c===10);}
 function commit(){save();renderTop();}
 
@@ -456,12 +466,12 @@ async function pitchPng(){const src=await vPitchSVG();
   const img=new Image();await new Promise((ok,ko)=>{img.onload=ok;img.onerror=ko;img.src='data:image/svg+xml;charset=utf-8,'+encodeURIComponent(src);});
   const c=document.createElement('canvas');c.width=840;c.height=1470;const g=c.getContext('2d');
   g.fillStyle='#efe5cc';g.fillRect(0,0,840,1470);g.fillStyle='#1b2140';g.fillRect(14,14,812,1292);g.drawImage(img,20,20,800,1280);
-  const a=teamVal('A'),b=teamVal('B'),pa=Math.round(a/(a+b)*100),[lab]=verdictOf(Math.abs(a-b));
+  const a=teamVal('A'),b=teamVal('B'),{avA,avB,pa}=balInfo(),[lab]=verdictOf(Math.abs(a-b));
   g.textBaseline='middle';const t=lab.toUpperCase();g.font='bold 30px "Courier Prime","Courier New",monospace';const w=g.measureText(t).width+44;
   g.save();g.translate(420,1350);g.rotate(-.035);g.strokeStyle='#1b2140';g.lineWidth=4;g.strokeRect(-w/2,-25,w,50);g.fillStyle='#1b2140';g.textAlign='center';g.fillText(t,0,2);g.restore();
   const bx=40,by=1395,bw=760,bh=44,wa=Math.round(bw*pa/100);g.fillStyle='#1b2442';g.fillRect(bx,by,wa,bh);g.fillStyle='#fbf8ee';g.fillRect(bx+wa,by,bw-wa,bh);
   g.strokeStyle='#1b2140';g.lineWidth=3;g.strokeRect(bx,by,bw,bh);g.fillStyle='#e2b93b';g.fillRect(bx+bw/2-2,by-4,4,bh+8);
-  g.font='26px Anton, Impact, sans-serif';g.textAlign='left';g.fillStyle='#f7f1de';g.fillText(`OSCUROS ${pa}%`,bx+12,by+bh/2+1);g.textAlign='right';g.fillStyle='#1b2140';g.fillText(`${100-pa}% CLAROS`,bx+bw-12,by+bh/2+1);
+  g.font='26px Anton, Impact, sans-serif';g.textAlign='left';g.fillStyle='#f7f1de';g.fillText(`OSCUROS ${fmt1(avA)}`,bx+12,by+bh/2+1);g.textAlign='right';g.fillStyle='#1b2140';g.fillText(`${fmt1(avB)} CLAROS`,bx+bw-12,by+bh/2+1);
   return new Promise((ok,ko)=>c.toBlob(bl=>bl?ok(bl):ko(),'image/png'));}
 $('btnImg').onclick=async()=>{if(placed().length<10)return;try{imgBlob=await pitchPng();$('imgOut').src=URL.createObjectURL(imgBlob);
   let can=false;try{can=!!(navigator.canShare&&navigator.canShare({files:[new File([imgBlob],'partido.png',{type:'image/png'})]}));}catch(e){}
