@@ -372,7 +372,14 @@ function rowHTML(p){const on=isSel(p.id),me=p.id===ME.who,cu=!!p.custom,ctl=!cu&
 let SL=null,listDirty=false;
 function renderList(){if(SL){listDirty=true;return;}listDirty=false;$('soy').parentNode.hidden=!VOTACION_ABIERTA;
   $('soy').innerHTML=`<option value="">No digo</option>`+ROSTER.map(p=>`<option value="${p.id}"${ME.who===p.id?' selected':''}>${esc(p.name)}</option>`).join('');
-  $('rows').innerHTML=all().map(rowHTML).join('');}
+  /* la lista sigue el ranking de puntajes (sin mostrarlo); al reordenar, la fila que mirabas queda en el mismo lugar */
+  const L=$('list'),hb=document.querySelector('.lhead').getBoundingClientRect().bottom;let anc=null;
+  if(L.scrollTop>0)for(const r of $('rows').children){const b=r.getBoundingClientRect();if(b.bottom>hb+4){anc={id:r.dataset.row,top:b.top};break;}}
+  $('rows').innerHTML=rankedList().map(rowHTML).join('');
+  if(anc){const r=document.querySelector(`[data-row="${anc.id}"]`);if(r)L.scrollTop+=r.getBoundingClientRect().top-anc.top;}}
+/* ranking: primero el de mayor puntaje promedio; los que no tienen votos, al final; los invitados, abajo de todo */
+function rankedList(){const has=id=>{const pr=profOf(id);return !!pr&&ATTRS.some(([k])=>attrN(pr,k));};
+  return ROSTER.slice().sort((a,b)=>(has(b.id)-has(a.id))||(score(b.id)-score(a.id))||a.name.localeCompare(b.name)).concat(DB.custom);}
 /* Actualiza una fila sin rearmarla (no corta el arrastre de la barrita) */
 function updateRow(id){const r=document.querySelector(`[data-row="${id}"]`),p=P(id);if(!r||!p)return;const on=isSel(id);
   r.classList.toggle('on',on);r.querySelector('.face').setAttribute('aria-pressed',on);
