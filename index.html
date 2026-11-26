@@ -13,6 +13,7 @@
   color-scheme:light;
 }
 *{box-sizing:border-box}
+[hidden]{display:none!important}
 body{margin:0;color:var(--ink);font-family:var(--body);font-size:15px;line-height:1.45;background:var(--paper);
   background-image:radial-gradient(rgba(27,33,64,.07) 1px,transparent 1.2px),radial-gradient(rgba(214,69,58,.05) 1px,transparent 1.2px);
   background-size:6px 6px,9px 9px;background-position:0 0,3px 4px;
@@ -60,12 +61,15 @@ button,select,input{font:inherit}
 .benchbox{background:var(--card);border:2px solid var(--ink);padding:12px;display:flex;flex-direction:column;gap:10px}
 .benchbox.hot{outline:4px dashed var(--red);outline-offset:-6px}
 .benchbox h2{font-family:var(--display);font-weight:400;font-size:26px;text-transform:uppercase;margin:0;line-height:1}
-.bench{display:grid;grid-template-columns:repeat(auto-fill,minmax(104px,1fr));gap:16px 12px}
+.bench{display:grid;grid-template-columns:repeat(auto-fill,minmax(138px,1fr));gap:22px 16px}
+@media (max-width:480px){.bench{grid-template-columns:repeat(2,minmax(0,1fr))}}
 .bcard{position:relative;display:flex;flex-direction:column;gap:4px;background:none;border:0;padding:0;cursor:grab;color:var(--ink);text-align:left;touch-action:pan-y}
-.bcard .fig{display:block;width:100%;aspect-ratio:3/3.65;background:#fff;padding:3px;box-shadow:0 8px 14px -6px rgba(27,33,64,.5);transform:rotate(var(--rot,0deg));overflow:hidden;transition:transform .15s}
-.bcard:hover .fig{transform:rotate(0) translateY(-3px)}
+.bcard .fig{position:relative;display:block;width:100%;aspect-ratio:3/3.65;background:#fff;padding:4px;box-shadow:0 12px 20px -8px rgba(27,33,64,.6);transform:rotate(var(--rot,0deg));overflow:hidden;transition:transform .2s,box-shadow .2s}
+.bcard .fig::after{content:"";position:absolute;inset:0;pointer-events:none;background:linear-gradient(115deg,transparent 35%,rgba(255,255,255,.45) 48%,transparent 60%);background-size:250% 100%;background-position:120% 0;transition:background-position .6s}
+.bcard:hover .fig{transform:rotate(0) translateY(-6px) scale(1.04);box-shadow:0 20px 28px -10px rgba(27,33,64,.65)}
+.bcard:hover .fig::after{background-position:-30% 0}
 .bcard .fig img,.bcard .fig svg{width:100%;height:100%;object-fit:cover;object-position:50% 100%;display:block;pointer-events:none}
-.bcard .nm{font-family:var(--display);font-size:14px;text-transform:uppercase;line-height:1.05;overflow-wrap:anywhere}
+.bcard .nm{font-family:var(--display);font-size:17px;text-transform:uppercase;line-height:1.05;overflow-wrap:anywhere}
 .bcard.in .fig{outline:5px solid var(--mustard);outline-offset:-1px;transform:rotate(0)}
 .bcard .chk{position:absolute;right:-8px;top:58%;transform:rotate(-9deg);background:var(--red);color:#fff;font-family:var(--display);font-size:13px;letter-spacing:.06em;
   padding:2px 8px;border:3px solid var(--chalk);box-shadow:0 4px 10px rgba(0,0,0,.35);z-index:1;pointer-events:none}
@@ -120,16 +124,80 @@ dialog form{padding:16px;display:flex;flex-direction:column;gap:12px}
 .ava img{width:100%;height:100%;object-fit:cover}
 .toast{position:fixed;left:50%;bottom:calc(22px + env(safe-area-inset-bottom,0px));transform:translateX(-50%) rotate(-1deg);background:var(--ink);color:var(--mustard);
   padding:8px 14px;font-family:var(--type);font-weight:700;border:2px solid var(--mustard);z-index:60;max-width:calc(100vw - 32px)}
-@media (prefers-reduced-motion:reduce){.bcard .fig,.btn,.track i{transition:none}}
+@media (prefers-reduced-motion:reduce){.bcard .fig,.btn,.track i,.tab .dot{transition:none;animation:none}}
+/* pestañas */
+.tabs{display:flex;gap:6px;flex-wrap:wrap;align-items:center;position:sticky;top:env(safe-area-inset-top,0px);z-index:8;background:var(--paper);padding-block:8px;border-bottom:3px solid var(--ink)}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:10;background:var(--paper)}
+.tab{position:relative;font-family:var(--display);font-size:clamp(17px,2.6vw,22px);text-transform:uppercase;letter-spacing:.03em;padding:6px 14px;border:2.5px solid var(--ink);background:var(--chalk);color:var(--ink);cursor:pointer;text-decoration:none}
+.tab[aria-current="page"]{background:var(--ink);color:var(--mustard)}
+.tab .dot{position:absolute;top:-9px;right:-8px;background:var(--red);color:#fff;font-size:11px;padding:1px 6px;border:2px solid var(--chalk);transform:rotate(8deg);animation:bob 1.6s ease-in-out infinite}
+@keyframes bob{50%{transform:rotate(8deg) translateY(-3px)}}
+.help{margin-left:auto;font-family:var(--type);font-weight:700;font-size:13px;background:none;border:0;color:var(--ink);text-decoration:underline;cursor:pointer}
+.votebanner{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;background:var(--red);color:#fff;padding:12px 16px;border:3px solid var(--ink);box-shadow:5px 5px 0 var(--ink);margin-bottom:14px}
+.votebanner b{font-family:var(--display);font-weight:400;font-size:clamp(20px,3vw,26px);text-transform:uppercase;line-height:1.05}
+.votebanner .btn{box-shadow:3px 3px 0 var(--ink);text-decoration:none}
+.big.share{background:var(--red);color:#fff;width:100%}
+.big.share small{color:#ffe7e3}
+/* votar */
+.vgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(170px,1fr));gap:24px 18px}
+@media (max-width:480px){.vgrid{grid-template-columns:repeat(2,minmax(0,1fr));gap:18px 12px}}
+.vcard{display:flex;flex-direction:column;gap:8px;min-width:0}
+.vcard .fig{aspect-ratio:3/3.65;background:#fff;padding:4px;box-shadow:0 12px 20px -8px rgba(27,33,64,.55);transform:rotate(var(--rot,0deg));overflow:hidden}
+.vcard .fig img,.vcard .fig svg{width:100%;height:100%;object-fit:cover;object-position:50% 100%;display:block}
+.vcard.done .fig{outline:5px solid var(--mustard);outline-offset:-1px}
+.notes{display:grid;grid-template-columns:repeat(5,1fr);gap:4px}
+.notes button{font-family:var(--display);font-size:17px;padding:4px 0;border:2px solid var(--ink);background:#fff;color:var(--ink);cursor:pointer}
+.notes button[aria-pressed="true"]{background:var(--ink);color:var(--mustard);transform:scale(1.08)}
+.notelbl{font-family:var(--type);font-size:12px;font-weight:700;min-height:1.3em;color:var(--red)}
+.whogrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(96px,1fr));gap:14px 10px}
+.who{background:none;border:0;padding:0;cursor:pointer;display:flex;flex-direction:column;gap:4px;color:var(--ink);text-align:left}
+.who .fig{display:block;aspect-ratio:3/3.65;background:#fff;padding:3px;box-shadow:0 6px 12px -6px rgba(0,0,0,.5);overflow:hidden}
+.who .fig img,.who .fig svg{width:100%;height:100%;object-fit:cover;object-position:50% 100%}
+.who span{font-family:var(--display);font-size:13px;text-transform:uppercase}
+.sendbar{position:sticky;bottom:calc(10px + env(safe-area-inset-bottom,0px));display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;background:var(--ink);color:var(--chalk);padding:10px 14px;border:3px solid var(--mustard);z-index:6}
+.sendbar b{font-family:var(--display);font-weight:400;font-size:22px}
+/* ranking */
+.podium{display:grid;grid-template-columns:1fr 1.2fr 1fr;gap:14px;align-items:end;max-width:720px;margin-inline:auto;width:100%}
+.pod{display:flex;flex-direction:column;align-items:center;gap:6px;min-width:0}
+.pod .fig{display:block;width:100%;aspect-ratio:3/3.65;background:#fff;padding:4px;box-shadow:0 14px 24px -8px rgba(27,33,64,.6);overflow:hidden}
+.pod .fig img,.pod .fig svg{width:100%;height:100%;object-fit:cover;object-position:50% 100%}
+.pod .medal{font-family:var(--display);font-size:20px;width:46px;height:46px;border-radius:50%;display:grid;place-items:center;border:3px solid var(--ink);margin-top:-26px;z-index:1}
+.pod .step{width:100%;background:var(--ink);color:var(--mustard);font-family:var(--display);text-align:center;font-size:clamp(14px,2.4vw,20px);padding:6px 4px;line-height:1.15;overflow-wrap:anywhere}
+.pod.p1 .step{padding-block:22px}.pod.p2 .step{padding-block:12px}
+.rlist{display:flex;flex-direction:column;gap:8px;max-width:720px;margin-inline:auto;width:100%}
+.rrow{display:grid;grid-template-columns:34px 52px minmax(0,1fr) auto;gap:10px;align-items:center;background:var(--card);border:2px solid var(--ink);padding:6px 10px}
+.rrow .pos{font-family:var(--display);font-size:22px;color:var(--red)}
+.rrow .mini{display:block;width:52px;aspect-ratio:3/3.65;background:#fff;padding:2px;overflow:hidden}
+.rrow .mini img,.rrow .mini svg{width:100%;height:100%;object-fit:cover;object-position:50% 100%}
+.rrow .nm{font-family:var(--display);font-size:18px;text-transform:uppercase;line-height:1.05}
+.rrow .bar2{height:8px;background:var(--paper-2);margin-top:4px}.rrow .bar2 i{display:block;height:100%;background:var(--celeste)}
+.rrow .avg{font-family:var(--display);font-size:24px;text-align:right;line-height:1}.rrow .avg small{display:block;font-family:var(--type);font-size:11px;color:var(--ink-soft)}
+/* bienvenida */
+.guide{width:min(560px,calc(100vw - 32px))}
+.gsteps{display:flex;flex-direction:column;gap:12px;margin:0;padding:0;list-style:none}
+.gsteps li{display:grid;grid-template-columns:44px minmax(0,1fr);gap:12px;align-items:start}
+.gsteps .n{width:44px;height:44px;border-radius:50%;background:var(--red);color:#fff;font-family:var(--display);font-size:24px;display:grid;place-items:center}
+.gsteps b{font-family:var(--display);font-weight:400;font-size:22px;text-transform:uppercase;display:block;line-height:1.1}
+.gsteps p{margin:2px 0 0;font-family:var(--type);font-size:13.5px}
 </style>
 
 <div class="wrap">
+  <nav class="tabs" aria-label="Secciones">
+    <a class="tab" href="#armar" data-tab="armar">Armar partido</a>
+    <a class="tab" href="#votar" data-tab="votar">Votar<span class="dot" id="voteDot">¡Votá!</span></a>
+    <a class="tab" href="#ranking" data-tab="ranking">Ranking</a>
+    <button class="help" id="btnHelp" type="button">¿Cómo funciona?</button>
+  </nav>
+  <section id="v-armar">
+  <div class="votebanner" id="voteBanner" hidden><b>¿Ya votaste a tus compañeros?<br>Poneles nota y armamos el Ranking PAS.</b><a class="btn primary" href="#votar">Votar ahora</a></div>
   <div class="top">
     <div><h1>Armá el partido</h1><p class="sub">1) Convocá a los 10 · 2) Armar parejos · 3) Retocá arrastrando en la cancha. Remera oscura contra remera clara.</p></div>
     <div class="bar">
       <div class="f"><label for="mDate">Fecha</label><input id="mDate" type="date"></div>
-      <div class="f"><label for="mForm">Formación</label>
-        <select id="mForm"><option value="2-2">Arquero + 2-2</option><option value="1-2-1">Arquero + 1-2-1</option><option value="2-1-1">Arquero + 2-1-1</option><option value="1-1-2">Arquero + 1-1-2</option></select></div>
+      <div class="f"><label for="mFormA">Formación Oscuros</label>
+        <select id="mFormA"><option value="2-2">Arquero + 2-2</option><option value="1-2-1">Arquero + 1-2-1</option><option value="2-1-1">Arquero + 2-1-1</option><option value="1-1-2">Arquero + 1-1-2</option></select></div>
+      <div class="f"><label for="mFormB">Formación Claros</label>
+        <select id="mFormB"><option value="2-2">Arquero + 2-2</option><option value="1-2-1">Arquero + 1-2-1</option><option value="2-1-1">Arquero + 2-1-1</option><option value="1-1-2">Arquero + 1-1-2</option></select></div>
     </div>
   </div>
 
@@ -148,11 +216,10 @@ dialog form{padding:16px;display:flex;flex-direction:column;gap:12px}
         </div>
       </div>
       <div class="pitchbox"><svg id="pitch" viewBox="0 0 400 640" role="img" aria-label="Cancha: soltá acá las figuritas"></svg></div>
+      <button class="big share" id="btnImg"><b>Compartir imagen</b><small>La cancha lista para mandar al grupo</small></button>
       <div class="bar">
-        <button class="btn" id="btnClear">Empezar de nuevo</button>
-        <button class="btn" id="btnImg">Compartir imagen</button>
-        <button class="btn" id="btnCopy">Copiar para WhatsApp</button>
         <button class="btn" id="btnSave">Guardar partido</button>
+        <button class="btn" id="btnClear">Empezar de nuevo</button>
       </div>
     </section>
 
@@ -169,7 +236,44 @@ dialog form{padding:16px;display:flex;flex-direction:column;gap:12px}
       </div>
     </section>
   </div>
+  </section>
+
+  <section id="v-votar" hidden>
+    <div class="top"><div><h1>Votá a tus compañeros</h1><p class="sub">Del 1 al 10, sin registrarte. Podés cambiar tus notas cuando quieras: vale la última.</p></div></div>
+    <div id="whoBox" class="col" style="margin-top:14px">
+      <span class="stephead"><span class="num">1</span>¿Quién sos?</span>
+      <p class="hint" style="margin:0">Elegí tu figurita (así no te votás a vos mismo). Si no estás, tocá "Soy invitado".</p>
+      <div class="whogrid" id="whoGrid"></div>
+    </div>
+    <div id="voteBox" class="col" style="margin-top:14px" hidden>
+      <div class="bar" style="justify-content:space-between"><span class="stephead"><span class="num">2</span>Poneles nota</span><button class="btn small" id="btnWho">Cambiar quién soy</button></div>
+      <p class="hint" style="margin:0">1–3 Tronco · 4–6 Cumple · 7–8 Crack · 9–10 Leyenda del potrero</p>
+      <div class="vgrid" id="vgrid"></div>
+      <div class="sendbar"><b id="voteProg">0 notas</b><button class="btn primary" id="btnSend">Enviar mis votos</button></div>
+    </div>
+  </section>
+
+  <section id="v-ranking" hidden>
+    <div class="top"><div><h1>Ranking PAS</h1><p class="sub" id="rankSub">Promedio de los votos de todos.</p></div><a class="btn primary" href="#votar" style="text-decoration:none">Votar</a></div>
+    <div class="col" style="margin-top:30px;gap:22px">
+      <div class="podium" id="podium"></div>
+      <div class="rlist" id="rlist"></div>
+    </div>
+  </section>
 </div>
+
+<dialog id="guideDlg" class="guide">
+  <form method="dialog">
+    <h2 style="font-family:var(--display);font-weight:400;font-size:34px;text-transform:uppercase;margin:0;line-height:1">Bienvenido a Fútbol PAS</h2>
+    <ol class="gsteps">
+      <li><span class="n">1</span><div><b>Convocá a los 10</b><p>En "Armar partido", tocá las figuritas de los que juegan. Con la <b>i</b> marcás si ataja, dónde juega y cómo.</p></div></li>
+      <li><span class="n">2</span><div><b>Armar parejos</b><p>El botón amarillo reparte a los 10 en remera oscura y remera clara. ¿No te gusta? Tocá "Otra opción" o arrastrá figuritas para cambiarlas.</p></div></li>
+      <li><span class="n">3</span><div><b>Compartí la cancha</b><p>Con "Compartir imagen" la mandás al grupo de WhatsApp.</p></div></li>
+      <li><span class="n">4</span><div><b>Votá y mirá el ranking</b><p>Poné nota del 1 al 10 a cada uno. Los votos de todos arman el Ranking PAS y ayudan a que los equipos salgan más parejos.</p></div></li>
+    </ol>
+    <button class="btn primary">¡Vamos!</button>
+  </form>
+</dialog>
 
 <dialog id="detDlg">
   <form method="dialog" id="detFrm">
@@ -258,7 +362,8 @@ const placed=()=>['A','B'].flatMap(k=>[M[k].gk,...M[k].s]).filter(Boolean);
 const members=k=>[M[k].gk,...M[k].s].filter(Boolean);
 
 /* ---------- Valores ocultos ---------- */
-function val(id,asGk){const p=P(id);if(!p)return 0;const d=det(id);let v=p.custom?parseFloat(d.lvl||'5.5'):p.r;if(asGk&&p.gkr)v=p.gkr;
+function base(p){const v=VS.players&&VS.players[p.id];if(!v||!v.c)return p.r;const avg=v.s/v.c;return (p.r*3+avg*v.c)/(3+v.c);}
+function val(id,asGk){const p=P(id);if(!p)return 0;const d=det(id);let v=p.custom?parseFloat(d.lvl||'5.5'):base(p);if(asGk&&p.gkr)v=p.gkr;
   for(const k of d.tr){const t=TRAITS.find(x=>x[0]===k);if(t)v+=t[2];}return v;}
 function teamVal(k){const t=M[k];return (t.gk?val(t.gk,true):0)+t.s.reduce((a,id)=>a+(id?val(id):0),0);}
 function verdictOf(d){return d<=1?['Muy parejo','#6fd08e']:d<=2.5?['Parejo','#e2b93b']:['Desparejo','#f08a80'];}
@@ -267,7 +372,8 @@ function verdictOf(d){return d<=1?['Muy parejo','#6fd08e']:d<=2.5?['Parejo','#e2
 const posOf=id=>{const k=det(id).pos;return ['DEF','MED','DEL'].includes(k)?k:null;};
 const fit=(id,t)=>{const p=posOf(id);return !p?1:(p===t?3:0);};
 function perms(a){if(a.length<=1)return[a];const o=[];a.forEach((x,i)=>perms(a.filter((_,j)=>j!==i)).forEach(r=>o.push([x,...r])));return o;}
-function bestSlots(ids){const F=FORMS[M.form];let best=null;for(const pm of perms(ids)){const s=pm.reduce((a,id,i)=>a+fit(id,F[i].t),0);if(!best||s>best.s)best={s,slots:pm};}return best.slots;}
+const fm=k=>M[k].form||M.form||'2-2';
+function bestSlots(ids,form){const F=FORMS[form];let best=null;for(const pm of perms(ids)){const s=pm.reduce((a,id,i)=>a+fit(id,F[i].t),0);if(!best||s>best.s)best={s,slots:pm};}return best.slots;}
 function pickGk(ids){const g=ids.filter(id=>det(id).pos==='ARQ').sort((a,b)=>val(b,true)-val(a,true));return g.length?g[0]:[...ids].sort((a,b)=>val(a)-val(b))[0];}
 function combos(arr,k,s=0,cur=[],out=[]){if(cur.length===k){out.push(cur.slice());return out;}for(let i=s;i<arr.length;i++){cur.push(arr[i]);combos(arr,k,i+1,cur,out);cur.pop();}return out;}
 function computeOpts(pl){const first=pl[0],rest=pl.slice(1),gkN=pl.filter(id=>det(id).pos==='ARQ').length,hasDef=pl.some(id=>posOf(id)==='DEF'),hasDel=pl.some(id=>posOf(id)==='DEL'),res=[];
@@ -277,7 +383,7 @@ function computeOpts(pl){const first=pl[0],rest=pl.slice(1),gkN=pl.filter(id=>de
       if(gkN>=2&&!T.some(id=>det(id).pos==='ARQ'))pen+=6;if(T.filter(id=>det(id).tr.includes('lesionado')).length>1)pen+=.8;}
     res.push({A,B,score:Math.abs(v[0]-v[1])*2+pen});}
   return res.sort((a,b)=>a.score-b.score).slice(0,12);}
-function applyOpt(o){for(const[k,ids]of[['A',o.A],['B',o.B]]){const g=pickGk(ids);M[k].gk=g;M[k].s=bestSlots(ids.filter(id=>id!==g));}}
+function applyOpt(o){for(const[k,ids]of[['A',o.A],['B',o.B]]){const g=pickGk(ids);M[k].gk=g;M[k].s=bestSlots(ids.filter(id=>id!==g),fm(k));}}
 /* La mejor permuta 1 por 1 para emparejar */
 function bestSwap(){if(placed().length!==10)return null;const d0=Math.abs(teamVal('A')-teamVal('B'));let best=null;
   for(let i=-1;i<4;i++)for(let j=-1;j<4;j++){if((i<0)!==(j<0))continue;const a=get('A',i),b=get('B',j);if(!a||!b)continue;
@@ -291,7 +397,7 @@ function autoPlace(id){if(where(id))return;
   const order=['A','B'].sort((x,y)=>members(x).length-members(y).length||teamVal(x)-teamVal(y));
   for(const k of order){
     if(wantGk&&!M[k].gk){M[k].gk=id;return true;}
-    if(!wantGk){const F=FORMS[M.form];let i=F.findIndex((sl,n)=>!M[k].s[n]&&sl.t===pos);if(i<0)i=M[k].s.indexOf(null);if(i>=0){M[k].s[i]=id;return true;}}}
+    if(!wantGk){const F=FORMS[fm(k)];let i=F.findIndex((sl,n)=>!M[k].s[n]&&sl.t===pos);if(i<0)i=M[k].s.indexOf(null);if(i>=0){M[k].s[i]=id;return true;}}}
   for(const k of order){if(!M[k].gk){M[k].gk=id;return true;}const i=M[k].s.indexOf(null);if(i>=0){M[k].s[i]=id;return true;}}
   toast('La cancha está llena: arrastrá a alguien al plantel para hacer lugar.');return false;}
 function moveTo(id,k,s){const from=where(id);if(from&&from.k===k&&from.s===s)return;const occ=get(k,s);
@@ -340,7 +446,7 @@ function slotSVG(k,s,x,y,label){const id=get(k,s),T=TEAM[k],lw=Math.max(46,label
     <g transform="translate(23 -36) scale(.33)"><path d="${SHIRT}" fill="${T.shirt}" stroke="#1b2140" stroke-width="4"/></g>
     <g transform="rotate(${-rot(id)*2})">${tape}</g></g></g>`;}
 function renderPitch(){let s=pitchBase();
-  for(const k of['A','B']){const Y=y=>k==='A'?640-y:y;s+=slotSVG(k,-1,GKSLOT.x,Y(GKSLOT.y),GKSLOT.l);FORMS[M.form].forEach((sl,i)=>{s+=slotSVG(k,i,sl.x,Y(sl.y),sl.l);});}
+  for(const k of['A','B']){const Y=y=>k==='A'?640-y:y;s+=slotSVG(k,-1,GKSLOT.x,Y(GKSLOT.y),GKSLOT.l);FORMS[fm(k)].forEach((sl,i)=>{s+=slotSVG(k,i,sl.x,Y(sl.y),sl.l);});}
   s+=`<g transform="translate(26 40) rotate(-4)" pointer-events="none"><rect x="-4" y="-16" width="104" height="22" fill="#1b2442"/><text x="2" y="1" font-family="${DISPLAY}" font-size="15" fill="#f7f1de">REMERA OSCURA</text></g>`;
   s+=`<g transform="translate(278 612) rotate(3)" pointer-events="none"><rect x="-4" y="-16" width="100" height="22" fill="#fbf8ee" stroke="#1b2140"/><text x="2" y="1" font-family="${DISPLAY}" font-size="15" fill="#1b2140">REMERA CLARA</text></g>`;
   $('pitch').innerHTML=s;}
@@ -391,7 +497,7 @@ function tap(id,src){if(src.classList.contains('mk')){openDet(id);return;}
 
 /* ---------- Detalles ---------- */
 function openDet(id){detId=id;const p=P(id),d=det(id),w=where(id);
-  $('dMini').innerHTML=figHTML(p);$('dName').textContent=p.name;$('dWhere').textContent=w?`En ${TEAM[w.k].name} · ${w.s<0?'Arquero':FORMS[M.form][w.s].l}`:'En el plantel';
+  $('dMini').innerHTML=figHTML(p);$('dName').textContent=p.name;$('dWhere').textContent=w?`En ${TEAM[w.k].name} · ${w.s<0?'Arquero':FORMS[fm(w.k)][w.s].l}`:'En el plantel';
   $('dPos').innerHTML=POS.map(([k,l])=>`<button type="button" data-p="${k}" aria-pressed="${d.pos===k}">${l}</button>`).join('');
   $('dTr').innerHTML=TRAITS.map(([k,l,v])=>`<button type="button" class="${v<0?'neg':''}" data-t="${k}" aria-pressed="${d.tr.includes(k)}">${l}</button>`).join('');
   $('dLvlWrap').hidden=!p.custom;$('dLvl').innerHTML=LEVELS.map(([k,l])=>`<button type="button" data-l="${k}" aria-pressed="${d.lvl===k}">${l}</button>`).join('');
@@ -414,22 +520,18 @@ $('addFrm').addEventListener('submit',e=>{e.preventDefault();const name=$('aName
   const p={id:'c'+Date.now().toString(36),name,photo:photoDraft,custom:true};DB.custom.push(p);$('addDlg').close();if(M.sel.length<10)M.sel.push(p.id);commit();toast(`${name} sumado`);});
 
 /* ---------- Acciones ---------- */
-function syncInputs(){$('mDate').value=M.date||'';$('mForm').value=M.form||'2-2';}
+function syncInputs(){$('mDate').value=M.date||'';$('mFormA').value=fm('A');$('mFormB').value=fm('B');}
 $('mDate').onchange=e=>{M.date=e.target.value;commit();};
-$('mForm').onchange=e=>{M.form=e.target.value;for(const k of['A','B']){const f=M[k].s.filter(Boolean);const sl=bestSlots(f.concat(Array(4-f.length).fill(null)).filter(Boolean));
-  M[k].s=[...sl,...Array(4-sl.length).fill(null)];}commit();};
+for(const k of['A','B'])$('mForm'+k).onchange=e=>{M[k].form=e.target.value;const f=M[k].s.filter(Boolean);const sl=bestSlots(f,M[k].form);
+  M[k].s=[...sl,...Array(4-sl.length).fill(null)];opts=[];commit();};
 $('btnAuto').onclick=()=>{const pl=M.sel.slice();if(pl.length!==10){toast(`Faltan ${10-pl.length} convocados.`);return;}
   opts=computeOpts(pl);optIdx=0;applyOpt(opts[0]);commit();toast('Equipos armados');};
 $('btnOther').onclick=()=>{const pl=M.sel.slice();if(placed().length!==10){toast('Primero tocá Armar parejos.');return;}if(!opts.length)opts=computeOpts(pl);
   optIdx=(optIdx+1)%opts.length;applyOpt(opts[optIdx]);commit();toast(`Opción ${optIdx+1} de ${opts.length}`);};
 $('btnClear').onclick=e=>{const b=e.currentTarget;if(!b.dataset.armed){b.dataset.armed='1';b.textContent='¿Seguro?';setTimeout(()=>{b.dataset.armed='';b.textContent='Empezar de nuevo';},2500);return;}
-  b.dataset.armed='';b.textContent='Empezar de nuevo';const keep={date:M.date,form:M.form,det:M.det,sel:[]};M={...blank(),...keep};opts=[];commit();};
+  b.dataset.armed='';b.textContent='Empezar de nuevo';const keep={date:M.date,det:M.det,sel:[]};const fa=fm('A'),fb2=fm('B');M={...blank(),...keep};M.A.form=fa;M.B.form=fb2;opts=[];commit();};
 $('btnSave').onclick=()=>{if(placed().length<10){toast('Completá los 10 para guardar.');return;}M.saved=M.saved||Date.now();const c=JSON.parse(JSON.stringify(M));
   const i=DB.matches.findIndex(m=>m.saved===M.saved);if(i>=0)DB.matches[i]=c;else DB.matches.unshift(c);commit();toast('Partido guardado');};
-$('btnCopy').onclick=()=>{if(placed().length<10){toast('Completá los 10 primero.');return;}const F=FORMS[M.form];
-  const txt=[`⚽ Partido 5 vs 5 · ${ddmm(M.date)}`,''].concat(...['A','B'].map(k=>[`${k==='A'?'⚫':'⚪'} ${TEAM[k].name.toUpperCase()} (${M.form})`,`🧤 ${P(M[k].gk).name}`,
-    ...F.map((sl,i)=>`• ${P(M[k].s[i]).name} – ${sl.l}`),''])).join('\n').trim();
-  try{navigator.clipboard.writeText(txt).then(()=>toast('Equipos copiados'),()=>fb(txt));}catch(e){fb(txt);}};
 function fb(t){const ta=document.createElement('textarea');ta.value=t;document.body.appendChild(ta);ta.select();try{document.execCommand('copy');toast('Equipos copiados');}catch(e){}ta.remove();}
 
 const toDataURL=url=>fetch(url).then(r=>r.blob()).then(b=>new Promise(ok=>{const fr=new FileReader();fr.onload=()=>ok(fr.result);fr.readAsDataURL(b);}));
@@ -452,7 +554,58 @@ async function pitchPng(){const svg=$('pitch').cloneNode(true);svg.setAttribute(
 $('btnImg').onclick=async()=>{if(placed().length<10){toast('Completá los 10 primero.');return;}try{imgBlob=await pitchPng();$('imgOut').src=URL.createObjectURL(imgBlob);$('imgDlg').showModal();}catch(e){toast('No se pudo generar la imagen');}};
 $('imgCopy').onclick=()=>{try{navigator.clipboard.write([new ClipboardItem({'image/png':imgBlob})]).then(()=>toast('Imagen copiada'),()=>toast('Mantené apretada la imagen para copiarla'));}catch(e){toast('Mantené apretada la imagen para copiarla');}};
 
-load();syncInputs();render();
+/* ---------- Votación ---------- */
+const VOTE_URL='';
+const VK='pas-votos-v1';
+let VS={players:{},voters:0},ME={id:null,who:null,notes:{},sent:false};
+function vload(){try{const d=JSON.parse(localStorage.getItem(VK)||'null');if(d){ME=Object.assign(ME,d.me||{});VS=d.vs||VS;}}catch(e){}
+  if(!ME.id){ME.id=Array.from(crypto.getRandomValues(new Uint8Array(12)),b=>'abcdefghijkmnpqrstuvwxyz23456789'[b%32]).join('');vsave();}}
+function vsave(){try{localStorage.setItem(VK,JSON.stringify({me:ME,vs:VS}));}catch(e){}}
+const votables=()=>ROSTER.filter(p=>p.id!==ME.who);
+const NOTE_LBL=n=>n<=3?'Tronco':n<=6?'Cumple':n<=8?'Crack':'Leyenda del potrero';
+const fmt1=n=>n.toFixed(1).replace('.',',');
+async function fetchVotes(){if(!VOTE_URL)return;try{const r=await fetch(VOTE_URL);const d=await r.json();if(d&&d.players){VS=d;vsave();renderMeter();if(view==='ranking')renderRanking();}}catch(e){}}
+function renderWho(){$('whoGrid').innerHTML=ROSTER.map(p=>`<button type="button" class="who" data-who="${p.id}"><span class="fig">${figHTML(p)}</span><span>${esc(p.name)}</span></button>`).join('')+
+  `<button type="button" class="who" data-who="guest"><span class="fig" style="display:grid;place-items:center;font-family:var(--display);font-size:40px">?</span><span>Soy invitado</span></button>`;
+  $('whoGrid').querySelectorAll('[data-who]').forEach(b=>b.onclick=()=>{ME.who=b.dataset.who==='guest'?'':b.dataset.who;delete ME.notes[ME.who];vsave();renderVotar();window.scrollTo(0,0);});}
+function renderVotar(){const chose=ME.who!==null;$('whoBox').hidden=chose;$('voteBox').hidden=!chose;
+  if(!chose){renderWho();return;}
+  $('vgrid').innerHTML=votables().map(p=>{const n=ME.notes[p.id];return `<div class="vcard${n?' done':''}"><span class="fig" style="--rot:${rot(p.id)*.6}deg">${figHTML(p)}</span>
+    <div class="notes" role="group" aria-label="Nota para ${esc(p.name)}">${[1,2,3,4,5,6,7,8,9,10].map(k=>`<button type="button" data-v="${p.id}" data-n="${k}" aria-pressed="${n===k}">${k}</button>`).join('')}</div>
+    <span class="notelbl">${n?NOTE_LBL(n):''}</span></div>`;}).join('');
+  $('vgrid').querySelectorAll('[data-n]').forEach(b=>b.onclick=()=>{ME.notes[b.dataset.v]=+b.dataset.n;ME.sent=false;vsave();
+    const card=b.closest('.vcard');card.classList.add('done');card.querySelectorAll('[data-n]').forEach(x=>x.setAttribute('aria-pressed',x===b));
+    card.querySelector('.notelbl').textContent=NOTE_LBL(+b.dataset.n);voteProg();});
+  voteProg();}
+function voteProg(){const c=Object.keys(ME.notes).filter(k=>k!==ME.who).length;$('voteProg').textContent=`${c} de ${votables().length} con nota${ME.sent?' · enviados ✓':''}`;
+  $('btnSend').disabled=!c||!VOTE_URL;$('btnSend').textContent=VOTE_URL?(ME.sent?'Volver a enviar':'Enviar mis votos'):'Votación en preparación';}
+$('btnWho').onclick=()=>{ME.who=null;vsave();renderVotar();};
+$('btnSend').onclick=async()=>{const votes={};for(const[k,v]of Object.entries(ME.notes))if(k!==ME.who)votes[k]=v;
+  $('btnSend').disabled=true;$('btnSend').textContent='Enviando…';
+  try{const r=await fetch(VOTE_URL,{method:'POST',body:JSON.stringify({voter:ME.id,who:ME.who||'',votes})});const d=await r.json();if(d&&d.players)VS=d;ME.sent=true;vsave();toast('¡Votos enviados!');location.hash='ranking';}
+  catch(e){toast('No se pudo enviar. Probá de nuevo en un rato.');voteProg();}};
+function renderRanking(){const rows=ROSTER.map(p=>{const v=VS.players&&VS.players[p.id];return{p,avg:v&&v.c?v.s/v.c:null,c:v?v.c:0};}).filter(r=>r.avg!==null).sort((a,b)=>b.avg-a.avg||b.c-a.c);
+  $('rankSub').textContent=VS.voters?`Promedio de los votos de ${VS.voters} ${VS.voters===1?'persona':'personas'}.`:'Todavía no votó nadie. ¡Arrancá vos!';
+  const top=rows.slice(0,3),order=[1,0,2],cols=['#e2b93b','#c9ced6','#c98b52'];
+  $('podium').innerHTML=order.filter(i=>top[i]).map(i=>`<div class="pod p${i+1}"><span class="fig">${figHTML(top[i].p)}</span><span class="medal" style="background:${cols[i]}">${i+1}º</span>
+    <span class="step">${esc(top[i].p.name)}<br>${fmt1(top[i].avg)}</span></div>`).join('');
+  $('rlist').innerHTML=rows.slice(3).map((r,i)=>`<div class="rrow"><span class="pos">${i+4}º</span><span class="mini">${figHTML(r.p)}</span>
+    <div style="min-width:0"><div class="nm">${esc(r.p.name)}</div><div class="bar2"><i style="width:${r.avg*10}%"></i></div></div><span class="avg">${fmt1(r.avg)}<small>${r.c} ${r.c===1?'voto':'votos'}</small></span></div>`).join('')||
+    (rows.length?'':'<p class="hint" style="text-align:center">Cuando alguien vote, acá aparece el podio.</p>');}
+
+/* ---------- Pestañas y guía ---------- */
+let view='armar';
+function route(){const h=(location.hash||'#armar').slice(1);view=['armar','votar','ranking'].includes(h)?h:'armar';
+  ['armar','votar','ranking'].forEach(v=>$('v-'+v).hidden=v!==view);
+  document.querySelectorAll('.tab').forEach(t=>t.setAttribute('aria-current',t.dataset.tab===view?'page':'false'));
+  $('voteDot').hidden=ME.sent;$('voteBanner').hidden=ME.sent||!VOTE_URL;
+  if(view==='votar')renderVotar();if(view==='ranking'){renderRanking();fetchVotes();}}
+window.addEventListener('hashchange',()=>{route();window.scrollTo(0,0);});
+$('btnHelp').onclick=()=>$('guideDlg').showModal();
+
+load();vload();syncInputs();render();route();fetchVotes();
+try{if(!localStorage.getItem('pas-guia-vista')){$('guideDlg').showModal();localStorage.setItem('pas-guia-vista','1');}}catch(e){}
+
 </script>
 
 </body></html>
