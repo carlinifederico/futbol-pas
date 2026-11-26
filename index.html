@@ -352,8 +352,9 @@ const KEY='pas-armador-v2';
 
 let DB={custom:[],matches:[]};
 let M=null, opts=[], optIdx=0, photoDraft=null, tipSwap=null, detId=null;
-const blank=()=>({sel:[],date:new Date().toISOString().slice(0,10),form:'2-2',A:{gk:null,s:[null,null,null,null]},B:{gk:null,s:[null,null,null,null]},det:{}});
-function load(){try{const d=JSON.parse(localStorage.getItem(KEY)||'null');if(d){DB.custom=d.custom||[];DB.matches=d.matches||[];M=d.draft||null;}}catch(e){}if(!M)M=blank();fixSel(M);}
+const blank=()=>({v:2,sel:[],date:new Date().toISOString().slice(0,10),form:'2-2',A:{gk:null,s:[null,null,null,null],form:'2-2'},B:{gk:null,s:[null,null,null,null],form:'2-2'},det:{}});
+function load(){try{const d=JSON.parse(localStorage.getItem(KEY)||'null');if(d){DB.custom=d.custom||[];DB.matches=d.matches||[];M=d.draft||null;}}catch(e){}if(!M)M=blank();fixSel(M);
+  if(M.v!==2){M.v=2;M.form='2-2';M.A.form='2-2';M.B.form='2-2';for(const id in M.det){const q=P(id);if(q&&q.gkr&&M.det[id].pos==='ANY')M.det[id].pos='ARQ';}}}
 function fixSel(m){if(!Array.isArray(m.sel))m.sel=['A','B'].flatMap(k=>[m[k].gk,...m[k].s]).filter(Boolean);}
 const isSel=id=>M.sel.includes(id);
 function save(){try{localStorage.setItem(KEY,JSON.stringify({custom:DB.custom,matches:DB.matches,draft:M}));}catch(e){}}
@@ -378,7 +379,7 @@ function figHTML(p){if(p.photo)return `<div class="custom-face"><img src="${esc(
 
 /* ---------- Estado de la cancha ---------- */
 const votedPos=id=>{const v=VS.players&&VS.players[id];if(!v||!v.pos)return null;let best=null,n=0;for(const k in v.pos)if(v.pos[k]>n){n=v.pos[k];best=k;}return best;};
-const det=id=>M.det[id]||(M.det[id]={pos:votedPos(id)||'ANY',tr:[],lvl:'5.5'});
+const det=id=>M.det[id]||(M.det[id]={pos:(P(id)&&P(id).gkr)?'ARQ':(votedPos(id)||'ANY'),tr:[],lvl:'5.5'});
 const get=(k,s)=>s<0?M[k].gk:M[k].s[s];
 function set(k,s,id){if(s<0)M[k].gk=id;else M[k].s[s]=id;}
 function where(id){for(const k of['A','B']){if(M[k].gk===id)return{k,s:-1};const i=M[k].s.indexOf(id);if(i>=0)return{k,s:i};}return null;}
@@ -557,7 +558,7 @@ $('btnAuto').onclick=()=>{const pl=M.sel.slice();if(pl.length!==10){toast(`Falta
 $('btnOther').onclick=()=>{const pl=M.sel.slice();if(placed().length!==10){toast('Primero tocá Armar parejos.');return;}if(!opts.length)opts=computeOpts(pl);
   optIdx=(optIdx+1)%opts.length;applyOpt(opts[optIdx]);commit();toast(`Opción ${optIdx+1} de ${opts.length}`);};
 $('btnClear').onclick=e=>{const b=e.currentTarget;if(!b.dataset.armed){b.dataset.armed='1';b.textContent='¿Seguro?';setTimeout(()=>{b.dataset.armed='';b.textContent='Empezar de nuevo';},2500);return;}
-  b.dataset.armed='';b.textContent='Empezar de nuevo';const keep={date:M.date,det:M.det,sel:[]};const fa=fm('A'),fb2=fm('B');M={...blank(),...keep};M.A.form=fa;M.B.form=fb2;opts=[];commit();};
+  b.dataset.armed='';b.textContent='Empezar de nuevo';const keep={date:M.date,det:M.det,sel:[]};M={...blank(),...keep};M.A.form='2-2';M.B.form='2-2';opts=[];commit();};
 $('btnSave').onclick=()=>{if(placed().length<10){toast('Completá los 10 para guardar.');return;}M.saved=M.saved||Date.now();const c=JSON.parse(JSON.stringify(M));
   const i=DB.matches.findIndex(m=>m.saved===M.saved);if(i>=0)DB.matches[i]=c;else DB.matches.unshift(c);commit();toast('Partido guardado');};
 function fb(t){const ta=document.createElement('textarea');ta.value=t;document.body.appendChild(ta);ta.select();try{document.execCommand('copy');toast('Equipos copiados');}catch(e){}ta.remove();}
