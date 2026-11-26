@@ -43,7 +43,7 @@ button,select,input{font:inherit;color:inherit}
 .btn:focus-visible,.face:focus-visible,.sl:focus-visible,.pos button:focus-visible,select:focus-visible,input:focus-visible{outline:3px dashed var(--red);outline-offset:2px}
 /* ---- abajo ---- */
 .list{flex:1 1 auto;min-height:0;overflow-y:auto;overflow-x:hidden;overscroll-behavior:contain;-webkit-overflow-scrolling:touch;padding:0 10px calc(20px + env(safe-area-inset-bottom,0px))}
-.lhead{position:sticky;top:0;z-index:3;display:flex;align-items:center;gap:8px;padding:8px 0 7px;background:var(--paper);border-bottom:2px solid var(--ink)}
+.lhead{position:sticky;top:0;z-index:20;display:flex;align-items:center;gap:8px;padding:8px 0 7px;background:var(--paper);border-bottom:2px solid var(--ink)}
 .lhead b{white-space:nowrap;font-family:var(--display);font-weight:400;font-size:18px;text-transform:uppercase;letter-spacing:.02em}
 .cnt{display:inline-block;background:var(--ink);color:var(--mustard);padding:0 6px;margin-left:2px}
 .cnt.full{background:var(--ok);color:#fff}
@@ -54,7 +54,7 @@ button,select,input{font:inherit;color:inherit}
 .tipbox{display:flex;align-items:center;gap:8px;margin:8px 0 2px;padding:6px 8px 6px 10px;border-radius:6px;background:var(--ink);color:var(--chalk);font-size:13px;line-height:1.35}
 .tipbox span{flex:1}.tipbox b{color:var(--mustard)}
 .tipbox button{flex:none;width:32px;height:32px;margin:-4px -4px -4px 0;border:0;background:none;color:var(--chalk);font-size:16px;cursor:pointer}
-.rows{display:flex;flex-direction:column}
+.rows{display:flex;flex-direction:column;position:relative;z-index:0;isolation:isolate}
 .row{display:grid;grid-template-columns:72px minmax(0,1fr);gap:10px;align-items:start;padding:6px 4px 5px 2px;border-bottom:1px solid rgba(27,33,64,.13);border-left:4px solid transparent}
 .row.on{background:var(--ok-bg);border-left-color:var(--ok)}
 .face{position:relative;width:72px;height:85px;padding:0;border:2px solid var(--ink);border-radius:4px;background:#fff;cursor:pointer;overflow:visible;box-shadow:2px 2px 0 rgba(27,33,64,.25);transform:rotate(-1.5deg)}
