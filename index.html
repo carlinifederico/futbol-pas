@@ -158,6 +158,9 @@ dialog form{padding:16px;display:flex;flex-direction:column;gap:12px}
 .tabs{display:flex;gap:6px;flex-wrap:wrap;align-items:center;position:sticky;top:env(safe-area-inset-top,0px);z-index:8;background:var(--paper);padding-block:8px;border-bottom:3px solid var(--ink)}
 body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:10;background:var(--paper)}
 .tab{position:relative;font-family:var(--display);font-size:clamp(17px,2.6vw,22px);text-transform:uppercase;letter-spacing:.03em;padding:6px 14px;border:2.5px solid var(--ink);background:var(--chalk);color:var(--ink);cursor:pointer;text-decoration:none}
+.tab .tn{display:inline-grid;place-items:center;width:1.25em;height:1.25em;border-radius:50%;background:var(--red);color:#fff;font-size:.75em;margin-right:6px;vertical-align:.1em}
+.bcard .rstars{font-size:17px;letter-spacing:1px}
+.bcard .novote{font-family:var(--type);font-size:11px;color:var(--ink-soft)}
 .tab[aria-current="page"]{background:var(--ink);color:var(--mustard)}
 .tab .dot{position:absolute;top:-9px;right:-8px;background:var(--red);color:#fff;font-size:11px;padding:1px 6px;border:2px solid var(--chalk);transform:rotate(8deg);animation:bob 1.6s ease-in-out infinite}
 @keyframes bob{50%{transform:rotate(8deg) translateY(-3px)}}
@@ -219,8 +222,8 @@ body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset
 
 <div class="wrap">
   <nav class="tabs" aria-label="Secciones">
-    <a class="tab" href="#armar" data-tab="armar">Armar partido</a>
-    <a class="tab" href="#votar" data-tab="votar">Votar<span class="dot" id="voteDot">¡Votá!</span></a>
+    <a class="tab" href="#votar" data-tab="votar"><span class="tn">1</span>Votar<span class="dot" id="voteDot">¡Votá!</span></a>
+    <a class="tab" href="#armar" data-tab="armar"><span class="tn">2</span>Armar partido</a>
     <button class="help" id="btnHelp" type="button">¿Cómo funciona?</button>
   </nav>
   <section id="v-armar">
@@ -299,10 +302,10 @@ body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset
   <form method="dialog">
     <h2 style="font-family:var(--display);font-weight:400;font-size:34px;text-transform:uppercase;margin:0;line-height:1">Bienvenido a Fútbol PAS</h2>
     <ol class="gsteps">
-      <li><span class="n">1</span><div><b>Convocá a los 10</b><p>En "Armar partido", tocá las figuritas de los que juegan. Con el botón <b>•••</b> de cada figurita abrís su ficha: si ataja, dónde juega y cómo.</p></div></li>
-      <li><span class="n">2</span><div><b>Armar parejos</b><p>El botón amarillo reparte a los 10 en remera oscura y remera clara. ¿No te gusta? Tocá "Otra opción" o arrastrá figuritas para cambiarlas.</p></div></li>
-      <li><span class="n">3</span><div><b>Compartí la cancha</b><p>Con "Compartir imagen" la mandás al grupo de WhatsApp.</p></div></li>
-      <li><span class="n">4</span><div><b>Votá con estrellas</b><p>Ponele de 1 a 5 estrellas a cada uno. Es secreto. Las estrellas de todos son lo que usa el sistema para que los equipos salgan parejos.</p></div></li>
+      <li><span class="n">1</span><div><b>Votá a tus compañeros</b><p>Primero, en "Votar", ponele de 1 a 5 estrellas a cada uno. Es secreto. Sin estrellas el sistema no sabe quién es quién, así que esto es lo que hace que los equipos salgan parejos.</p></div></li>
+      <li><span class="n">2</span><div><b>Convocá a los 10</b><p>En "Armar partido", tocá las figuritas de los que juegan. Debajo de cada una ves sus estrellas. Con el botón <b>•••</b> abrís su ficha: posición y cómo juega.</p></div></li>
+      <li><span class="n">3</span><div><b>Armar parejos</b><p>El botón amarillo reparte a los 10 en remera oscura y remera clara, mirando estrellas, posición y perfil. La barra de balance te muestra qué tan parejo quedó. ¿No te gusta? "Otra opción" o arrastrá figuritas.</p></div></li>
+      <li><span class="n">4</span><div><b>Compartí la cancha</b><p>Con "Compartir imagen" la mandás al grupo de WhatsApp.</p></div></li>
     </ol>
     <button class="btn primary">¡Vamos!</button>
   </form>
@@ -496,6 +499,8 @@ function renderPitch(){let s=pitchBase();
   s+=`<g transform="translate(26 40) rotate(-4)" pointer-events="none"><rect x="-4" y="-16" width="104" height="22" fill="#1b2442"/><text x="2" y="1" font-family="${DISPLAY}" font-size="15" fill="#f7f1de">REMERA OSCURA</text></g>`;
   s+=`<g transform="translate(278 612) rotate(3)" pointer-events="none"><rect x="-4" y="-16" width="100" height="22" fill="#fbf8ee" stroke="#1b2140"/><text x="2" y="1" font-family="${DISPLAY}" font-size="15" fill="#1b2140">REMERA CLARA</text></g>`;
   $('pitch').innerHTML=s;}
+function benchStars(p){const v=VS.players&&VS.players[p.id];if(!v||!v.c)return p.custom?'':'<span class="novote">Sin votos todavía</span>';
+  return starsHTML(v.s/v.c);}
 function chipsOf(id){const d=M.det[id];if(!d)return '';fixDet(d);const c=[];
   if(d.pos&&d.pos!=='ANY')c.push(`<span class="pchip">${POS.find(x=>x[0]===d.pos)[1]}</span>`);
   for(const[k,,lo,hi]of ATTRS)if(d[k])c.push(`<span class="pchip ${d[k]>0?'pos':'neg'}">${d[k]>0?hi:lo}${Math.abs(d[k])>1?'+':''}</span>`);
@@ -512,7 +517,7 @@ function renderBench(){const c=M.sel.length,armed=placed().length===10;$('count'
     const on=isSel(p.id);
     return `<div class="bcard${on?' in':''}" data-drag="${p.id}" tabindex="0" role="button" aria-pressed="${on}" aria-label="${esc(p.name)}${on?', convocado':''}">
       ${w?`<span class="tag ${w.k}">${TEAM[w.k].name}</span>`:''}<span class="chk">✓ CONVOCADO</span><button type="button" class="info" data-info="${p.id}" aria-label="Ficha de ${esc(p.name)}: posición y cómo juega" title="Ficha del jugador">•••</button>
-      <span class="fig" style="--rot:${rot(p.id)*.6}deg">${figHTML(p)}</span><span class="nm">${esc(p.name)}</span>${chipsOf(p.id)}</div>`;}).join('')+
+      <span class="fig" style="--rot:${rot(p.id)*.6}deg">${figHTML(p)}</span><span class="nm">${esc(p.name)}</span>${benchStars(p)}${chipsOf(p.id)}</div>`;}).join('')+
     `<button type="button" class="add" id="btnAdd"><span><b>+</b>Sumar jugador</span></button>`;
   $('btnAdd').onclick=openAdd;}
 function renderSaved(){$('savedWrap').hidden=!DB.matches.length;
@@ -619,7 +624,7 @@ function vsave(){try{localStorage.setItem(VK,JSON.stringify({me:ME,vs:VS}));}cat
 const votables=()=>ROSTER.filter(p=>p.id!==ME.who);
 const VPOS=[['ARQ','Arquero'],['DEF','Defensa'],['MED','Medio'],['DEL','Delantero']];
 const starsHTML=avg10=>{const pct=Math.max(0,Math.min(100,avg10*10));return `<span class="rstars" aria-label="${(avg10/2).toFixed(1)} de 5 estrellas">★★★★★<i style="width:${pct}%">★★★★★</i></span>`;};
-async function fetchVotes(){if(!VOTE_URL)return;try{const r=await fetch(VOTE_URL);const d=await r.json();if(d&&d.players){VS=d;vsave();renderMeter();}}catch(e){}}
+async function fetchVotes(){if(!VOTE_URL)return;try{const r=await fetch(VOTE_URL);const d=await r.json();if(d&&d.players){VS=d;vsave();renderMeter();renderBench();}}catch(e){}}
 function renderWho(){$('whoGrid').innerHTML=ROSTER.map(p=>`<button type="button" class="who" data-who="${p.id}"><span class="fig">${figHTML(p)}</span><span>${esc(p.name)}</span></button>`).join('')+
   `<button type="button" class="who" data-who="guest"><span class="fig" style="display:grid;place-items:center;font-family:var(--display);font-size:40px">?</span><span>Soy invitado</span></button>`;
   $('whoGrid').querySelectorAll('[data-who]').forEach(b=>b.onclick=()=>{ME.who=b.dataset.who==='guest'?'':b.dataset.who;delete ME.stars[ME.who];delete ME.pos[ME.who];vsave();renderVotar();window.scrollTo(0,0);});}
@@ -662,7 +667,7 @@ function renderRanking(){const rows=ROSTER.map(p=>{const v=VS.players&&VS.player
 
 /* ---------- Pestañas y guía ---------- */
 let view='armar';
-function route(){const h=(location.hash||'#armar').slice(1);view=['armar','votar'].includes(h)?h:'armar';
+function route(){const h=(location.hash||(ME.sent?'#armar':'#votar')).slice(1);view=['armar','votar'].includes(h)?h:'armar';
   ['armar','votar'].forEach(v=>$('v-'+v).hidden=v!==view);
   document.querySelectorAll('.tab').forEach(t=>t.setAttribute('aria-current',t.dataset.tab===view?'page':'false'));
   $('voteDot').hidden=ME.sent;$('voteBanner').hidden=ME.sent||!VOTE_URL;
