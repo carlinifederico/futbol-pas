@@ -67,7 +67,7 @@ button,select,input{font:inherit}
 .benchbox{background:var(--card);border:2px solid var(--ink);padding:12px;display:flex;flex-direction:column;gap:10px}
 .benchbox.hot{outline:4px dashed var(--red);outline-offset:-6px}
 .benchbox h2{font-family:var(--display);font-weight:400;font-size:26px;text-transform:uppercase;margin:0;line-height:1}
-.bench{display:grid;grid-template-columns:repeat(auto-fill,minmax(138px,1fr));gap:22px 16px}
+.bench{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:22px 16px}
 @media (max-width:480px){.bench{grid-template-columns:repeat(2,minmax(0,1fr))}}
 .bcard{position:relative;display:flex;flex-direction:column;gap:4px;background:none;border:0;padding:0;cursor:grab;color:var(--ink);text-align:left;touch-action:pan-y}
 .bcard .fig{position:relative;display:block;width:100%;aspect-ratio:3/3.65;background:#fff;padding:4px;box-shadow:0 12px 20px -8px rgba(27,33,64,.6);transform:rotate(var(--rot,0deg));overflow:hidden;transition:transform .2s,box-shadow .2s}
@@ -160,6 +160,20 @@ body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset
 .tab{position:relative;font-family:var(--display);font-size:clamp(17px,2.6vw,22px);text-transform:uppercase;letter-spacing:.03em;padding:6px 14px;border:2.5px solid var(--ink);background:var(--chalk);color:var(--ink);cursor:pointer;text-decoration:none}
 .tab .tn{display:inline-grid;place-items:center;width:1.25em;height:1.25em;border-radius:50%;background:var(--red);color:#fff;font-size:.75em;margin-right:6px;vertical-align:.1em}
 .bcard .rstars{font-size:17px;letter-spacing:1px}
+.inl{display:flex;flex-direction:column;gap:5px;margin-top:2px;cursor:default}
+.ipos{display:grid;grid-template-columns:repeat(4,1fr);gap:2px}
+.ipos button{font-family:var(--type);font-size:10.5px;font-weight:700;padding:2px 0;border:1.5px solid var(--ink);background:#fff;color:var(--ink);cursor:pointer}
+.ipos button[aria-pressed="true"]{background:var(--ink);color:var(--mustard)}
+.iattrs{display:grid;grid-template-columns:1fr 1fr;gap:3px}
+.ia{display:grid;grid-template-columns:16px minmax(0,1fr) 16px;align-items:center;border:1.5px solid var(--ink-soft);background:#fff;min-height:24px}
+.ia span{font-family:var(--type);font-size:10.5px;font-weight:700;text-align:center;line-height:1.05;color:var(--ink-soft);overflow-wrap:anywhere}
+.ia.up{background:#d6e8f6;border-color:var(--ink)}.ia.down{background:#f0d2cc;border-color:var(--ink)}
+.ia.up span,.ia.down span{color:var(--ink)}
+.ia button{background:none;border:0;padding:0;height:100%;font-family:var(--display);font-size:16px;color:var(--ink);cursor:pointer}
+.ia button:disabled{opacity:.25;cursor:default}
+.ia button:focus-visible,.ipos button:focus-visible{outline:2px dashed var(--red);outline-offset:1px}
+.iles{display:flex;gap:6px;align-items:center;font-family:var(--type);font-size:11.5px;font-weight:700;cursor:pointer}
+.iles input{width:16px;height:16px;accent-color:var(--red)}
 .bcard .novote{font-family:var(--type);font-size:11px;color:var(--ink-soft)}
 .tab[aria-current="page"]{background:var(--ink);color:var(--mustard)}
 .tab .dot{position:absolute;top:-9px;right:-8px;background:var(--red);color:#fff;font-size:11px;padding:1px 6px;border:2px solid var(--chalk);transform:rotate(8deg);animation:bob 1.6s ease-in-out infinite}
@@ -266,7 +280,7 @@ body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset
     <section class="col plantel" aria-label="Plantel">
       <div class="benchbox" id="benchbox" data-drop="bench">
         <div class="bar" style="justify-content:space-between"><span class="stephead"><span class="num">1</span>¿Quiénes juegan?</span><span class="cnt" id="count"></span></div>
-        <p class="hint" style="margin:0">Tocá las figuritas de los 10 que juegan (otra vez para sacarlos). Con el botón <b>•••</b> abrís la ficha del jugador: posición y cómo juega. Después tocá <b>Armar parejos</b>.</p>
+        <p class="hint" style="margin:0">Tocá las figuritas de los 10 que juegan (otra vez para sacarlos). Debajo de cada una cambiás su posición y cómo juega, ahí mismo. Después tocá <b>Armar parejos</b>.</p>
         <span class="convlbl">CONVOCADOS (tocá una cara para sacarlo)</span>
         <div class="conv" id="conv"></div>
         <div class="bench" id="bench"></div>
@@ -303,7 +317,7 @@ body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset
     <h2 style="font-family:var(--display);font-weight:400;font-size:34px;text-transform:uppercase;margin:0;line-height:1">Bienvenido a Fútbol PAS</h2>
     <ol class="gsteps">
       <li><span class="n">1</span><div><b>Votá a tus compañeros</b><p>Primero, en "Votar", ponele de 1 a 5 estrellas a cada uno. Es secreto. Sin estrellas el sistema no sabe quién es quién, así que esto es lo que hace que los equipos salgan parejos.</p></div></li>
-      <li><span class="n">2</span><div><b>Convocá a los 10</b><p>En "Armar partido", tocá las figuritas de los que juegan. Debajo de cada una ves sus estrellas. Con el botón <b>•••</b> abrís su ficha: posición y cómo juega.</p></div></li>
+      <li><span class="n">2</span><div><b>Convocá a los 10</b><p>En "Armar partido", tocá las figuritas de los que juegan. Debajo de cada una ves sus estrellas. Debajo de cada una cambiás ahí mismo su posición y cómo juega (velocidad, físico, precisión, aguante y si viene tocado).</p></div></li>
       <li><span class="n">3</span><div><b>Armar parejos</b><p>El botón amarillo reparte a los 10 en remera oscura y remera clara, mirando estrellas, posición y perfil. La barra de balance te muestra qué tan parejo quedó. ¿No te gusta? "Otra opción" o arrastrá figuritas.</p></div></li>
       <li><span class="n">4</span><div><b>Compartí la cancha</b><p>Con "Compartir imagen" la mandás al grupo de WhatsApp.</p></div></li>
     </ol>
@@ -354,7 +368,7 @@ const ROSTER=[
  {id:'r16',name:'Mauro',r:6,f:'mauro'}];
 const POS=[['ANY','Cualquiera'],['DEF','Defensa'],['MED','Medio'],['DEL','Delantero']];
 /* Perfil: cada rasgo va de -2 a +2 entre dos opuestos. Pesa poco en el nivel y se reparte parejo entre los equipos. */
-const ATTRS=[['vel','Velocidad','Lento','Rápido'],['fis','Físico','Liviano','Fuerte'],['pre','Precisión','Impreciso','Preciso'],['res','Resistencia','Se cansa','Aguanta todo']];
+const ATTRS=[['vel','Velocidad','Lento','Rápido'],['fis','Físico','Liviano','Fuerte'],['pre','Precisión','Impreciso','Preciso'],['res','Aguante','Se cansa','Aguanta todo']];
 const TRAITS=[['rapido','Rápido',.2],['fuerte','Fuerte',.2],['preciso','Preciso',.3],['aguerrido','Aguerrido',.2],['goleador','Goleador',.3],
   ['lento','Lento',-.2],['lesionado','Medio lesionado',-.7]];
 const LEVELS=[['4','Recién arranca'],['5.5','Normal'],['7','Bueno'],['8.5','Crack']];
@@ -501,6 +515,13 @@ function renderPitch(){let s=pitchBase();
   $('pitch').innerHTML=s;}
 function benchStars(p){const v=VS.players&&VS.players[p.id];if(!v||!v.c)return p.custom?'':'<span class="novote">Sin votos todavía</span>';
   return starsHTML(v.s/v.c);}
+const POS_S=[['ANY','Cualq.'],['DEF','Def'],['MED','Medio'],['DEL','Del']];
+function attrTxt(k,v){const a=ATTRS.find(x=>x[0]===k);if(!v)return a[1];return (Math.abs(v)>1?'Muy ':'')+(v>0?a[3]:a[2]).toLowerCase().replace(/^./,c=>Math.abs(v)>1?c:c.toUpperCase());}
+function inlHTML(id){const d=det(id);
+  return `<div class="inl" data-inl="${id}">
+    <div class="ipos" role="group" aria-label="Posición">${POS_S.map(([k,l])=>`<button type="button" data-ip="${k}" aria-pressed="${d.pos===k}">${l}</button>`).join('')}</div>
+    <div class="iattrs">${ATTRS.map(([k,l])=>{const v=d[k]||0;return `<div class="ia ${v>0?'up':v<0?'down':''}"><button type="button" data-ia="${k}" data-d="-1" aria-label="${l}: menos" ${v<=-2?'disabled':''}>‹</button><span title="${l}">${attrTxt(k,v)}</span><button type="button" data-ia="${k}" data-d="1" aria-label="${l}: más" ${v>=2?'disabled':''}>›</button></div>`;}).join('')}</div>
+    <label class="iles"><input type="checkbox" data-il="1" ${d.les?'checked':''}> Viene tocado</label></div>`;}
 function chipsOf(id){const d=M.det[id];if(!d)return '';fixDet(d);const c=[];
   if(d.pos&&d.pos!=='ANY')c.push(`<span class="pchip">${POS.find(x=>x[0]===d.pos)[1]}</span>`);
   for(const[k,,lo,hi]of ATTRS)if(d[k])c.push(`<span class="pchip ${d[k]>0?'pos':'neg'}">${d[k]>0?hi:lo}${Math.abs(d[k])>1?'+':''}</span>`);
@@ -516,8 +537,8 @@ function renderBench(){const c=M.sel.length,armed=placed().length===10;$('count'
   $('bench').innerHTML=all().map(p=>{const w=where(p.id);
     const on=isSel(p.id);
     return `<div class="bcard${on?' in':''}" data-drag="${p.id}" tabindex="0" role="button" aria-pressed="${on}" aria-label="${esc(p.name)}${on?', convocado':''}">
-      ${w?`<span class="tag ${w.k}">${TEAM[w.k].name}</span>`:''}<span class="chk">✓ CONVOCADO</span><button type="button" class="info" data-info="${p.id}" aria-label="Ficha de ${esc(p.name)}: posición y cómo juega" title="Ficha del jugador">•••</button>
-      <span class="fig" style="--rot:${rot(p.id)*.6}deg">${figHTML(p)}</span><span class="nm">${esc(p.name)}</span>${benchStars(p)}${chipsOf(p.id)}</div>`;}).join('')+
+      ${w?`<span class="tag ${w.k}">${TEAM[w.k].name}</span>`:''}<span class="chk">✓ CONVOCADO</span>
+      <span class="fig" style="--rot:${rot(p.id)*.6}deg">${figHTML(p)}</span><span class="nm">${esc(p.name)}</span>${benchStars(p)}${inlHTML(p.id)}</div>`;}).join('')+
     `<button type="button" class="add" id="btnAdd"><span><b>+</b>Sumar jugador</span></button>`;
   $('btnAdd').onclick=openAdd;}
 function renderSaved(){$('savedWrap').hidden=!DB.matches.length;
@@ -530,7 +551,7 @@ function renderSaved(){$('savedWrap').hidden=!DB.matches.length;
 /* ---------- Arrastrar y soltar (mouse y dedo) ---------- */
 let drag=null,hot=null;
 function setHot(el){if(hot===el)return;hot?.classList.remove('hot');hot=el;hot?.classList.add('hot');}
-document.addEventListener('pointerdown',e=>{if(e.button>0||e.target.closest('[data-info]'))return;const src=e.target.closest('[data-drag]');if(!src)return;
+document.addEventListener('pointerdown',e=>{if(e.button>0||e.target.closest('[data-info]')||e.target.closest('.inl'))return;const src=e.target.closest('[data-drag]');if(!src)return;
   drag={id:src.dataset.drag,x:e.clientX,y:e.clientY,src,moved:false,ghost:null};});
 document.addEventListener('pointermove',e=>{if(!drag)return;
   if(!drag.moved){if(Math.hypot(e.clientX-drag.x,e.clientY-drag.y)<7)return;drag.moved=true;document.body.classList.add('dragging');
@@ -554,6 +575,12 @@ function tap(id,src){if(src.classList.contains('mk')){openDet(id);return;}
   if(M.sel.length>=10){toast('Ya hay 10 convocados. Tocá a alguien para sacarlo.');return;}
   M.sel.push(id);opts=[];commit();return;if(autoPlace(id)){opts=[];commit();toast(`${P(id).name} → ${TEAM[where(id).k].name}`);}}
 
+/* ---------- Edición en la tarjeta ---------- */
+$('bench').addEventListener('click',e=>{const box=e.target.closest('[data-inl]');if(!box)return;const id=box.dataset.inl,d=det(id);
+  const bp=e.target.closest('[data-ip]'),ba=e.target.closest('[data-ia]');
+  if(bp)d.pos=bp.dataset.ip;else if(ba){d[ba.dataset.ia]=Math.max(-2,Math.min(2,(d[ba.dataset.ia]||0)+(+ba.dataset.d)));}else return;
+  e.stopPropagation();opts=[];save();renderMeter();box.outerHTML=inlHTML(id);});
+$('bench').addEventListener('change',e=>{const c=e.target.closest('[data-il]');if(!c)return;const id=c.closest('[data-inl]').dataset.inl;det(id).les=c.checked;opts=[];save();renderMeter();});
 /* ---------- Detalles ---------- */
 function openDet(id){detId=id;const p=P(id),d=det(id),w=where(id);
   $('dMini').innerHTML=figHTML(p);$('dName').textContent=p.name;$('dWhere').textContent=w?`En ${TEAM[w.k].name} · ${w.s<0?'Arquero':FORMS[fm(w.k)][w.s].l}`:'En el plantel';
