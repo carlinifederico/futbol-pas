@@ -86,12 +86,12 @@ button,select,input{font:inherit;color:inherit}
 .sl{display:flex;flex-direction:column;cursor:pointer;touch-action:pan-y;user-select:none;-webkit-user-select:none;--th:24px}
 .sl .lb{display:flex;justify-content:space-between;font-size:12px;line-height:1.1;font-weight:600;color:var(--ink-soft)}
 .sl .lb b{font-size:10.5px;color:var(--ink);min-width:1ch;text-align:right;white-space:nowrap}
-.sl .tr{position:relative;height:30px}
+.sl .tr{position:relative;height:34px;margin-top:2px}
 .sl .tr::before{content:"";position:absolute;left:calc(var(--th)/2);right:calc(var(--th)/2);top:50%;height:8px;margin-top:-4px;border-radius:4px;background:rgba(27,33,64,.16)}
 .sl .tr i{position:absolute;left:calc(var(--th)/2);right:calc(var(--th)/2);top:50%;height:10px;margin-top:-5px;border-radius:5px;background:linear-gradient(90deg,#f2c94c,#3fae5a);clip-path:inset(0 calc((1 - var(--a))*100%) 0 0 round 4px);transition:clip-path .4s}
 .sl.mine .tr::after{display:none;content:"";position:absolute;z-index:1;left:calc(var(--th)/2);right:calc(var(--th)/2);top:50%;height:8px;margin-top:-4px;border-radius:4px;background:linear-gradient(90deg,#f2c94c,#3fae5a);clip-path:inset(0 calc((1 - var(--t))*100%) 0 0 round 4px)}
 .sl.mine:not(.drag) .tr::after{transition:clip-path .12s}
-.sl .tr s{position:absolute;z-index:2;top:50%;left:calc(var(--th)/2 + (100% - var(--th))*var(--a));width:3px;height:16px;margin:-8px 0 0 -1.5px;border-radius:2px;background:rgba(27,33,64,.6);transition:left .4s;display:none}
+.sl .tr s{position:absolute;z-index:5;top:calc(50% - 17px);left:calc(var(--th)/2 + (100% - var(--th))*var(--a));width:0;height:0;margin-left:-7px;border-left:7px solid transparent;border-right:7px solid transparent;border-top:10px solid var(--ink);filter:drop-shadow(0 0 1px #fff) drop-shadow(0 0 1px #fff);transition:left .4s;pointer-events:none}
 .sl.noavg .tr i,.sl.noavg .tr s{display:none}
 .sl .tr u{position:absolute;top:50%;width:4px;height:4px;margin:-2px 0 0 -2px;border-radius:50%;background:rgba(27,33,64,.45)}
 .sl .tr u:nth-of-type(1){left:calc(var(--th)/2)}.sl .tr u:nth-of-type(2){left:calc(var(--th)/2 + (100% - var(--th))*.25)}.sl .tr u:nth-of-type(3){left:50%}
@@ -245,10 +245,13 @@ const members=k=>[M[k].gk,...M[k].s].filter(Boolean);
 /* ---------- Valores ocultos ---------- */
 /* El promedio de todos (nunca se muestra como puntaje) es lo que usa el armador. Con pocas opiniones se mezcla con el puntaje inicial (pesa como 2). */
 function profOf(id){if(!VOTACION_ABIERTA)return null;const v=VS.players&&VS.players[id];return v&&v.prof&&v.prof.n?v.prof:null;}
-const attrOf=(id,k)=>{const pr=profOf(id);return pr?pr[k]||0:0;};
+const attrN=(pr,k)=>!pr?0:pr.k?(pr.k[KI[k]]||0):pr.n;
+const attrOf=(id,k)=>{const pr=profOf(id),c=attrN(pr,k);return c?(pr[k]||0)*c/(c+1):0;};
 const starsFromAttrs=a=>(3+(a[0]+a[1]+a[2]+a[3])/4)*2;
 function val(id){const p=P(id);if(!p)return 0;if(p.custom)return parseFloat(det(id).lvl||'5.5');const pr=profOf(id);if(!pr)return p.r;
-  return (p.r*2+starsFromAttrs([pr.vel,pr.fis,pr.pre,pr.res])*pr.n)/(2+pr.n);}
+  const w=ATTRS.reduce((a,[k])=>a+attrN(pr,k),0)/4;if(!w)return p.r;
+  const lvl=(3+ATTRS.reduce((a,[k])=>a+(pr[k]||0)*(attrN(pr,k)?1:0),0)/Math.max(1,ATTRS.filter(([k])=>attrN(pr,k)).length))*2;
+  return (p.r+lvl*w)/(1+w);}
 function teamVal(k){const t=M[k];return (t.gk?val(t.gk):0)+t.s.reduce((a,id)=>a+(id?val(id):0),0);}
 function verdictOf(d){return d<=1?['Muy parejo','v1']:d<=2.5?['Parejo','v2']:['Desparejo','v3'];}
 
@@ -265,7 +268,7 @@ function computeOpts(pl){const first=pl[0],rest=pl.slice(1),hasDef=pl.some(id=>p
     for(const T of[A,B]){const g=pickGk(T),field=T.filter(id=>id!==g);v.push(T.reduce((a,id)=>a+val(id),0));
       if(nArq>=2&&!T.some(id=>posOf(id)==='ARQ'))pen+=1.5;if(hasDef&&!field.some(id=>posOf(id)==='DEF'))pen+=1;if(hasDel&&!field.some(id=>posOf(id)==='DEL'))pen+=.6;}
     /* que no quede todo lo rápido (o todo lo fuerte, preciso…) de un mismo lado */
-    for(const[k]of ATTRS){const sa=A.reduce((x,id)=>x+attrOf(id,k),0),sb=B.reduce((x,id)=>x+attrOf(id,k),0);pen+=0.4*Math.abs(sa-sb);}
+    for(const[k]of ATTRS){const sa=A.reduce((x,id)=>x+attrOf(id,k),0),sb=B.reduce((x,id)=>x+attrOf(id,k),0);pen+=0.6*Math.abs(sa-sb);}
     res.push({A,B,score:Math.abs(v[0]-v[1])*2+pen});}
   return res.sort((a,b)=>a.score-b.score).slice(0,12);}
 function applyOpt(o){for(const[k,ids]of[['A',o.A],['B',o.B]]){const g=pickGk(ids);M[k].gk=g;M[k].s=bestSlots(ids.filter(id=>id!==g),fm(k));}}
