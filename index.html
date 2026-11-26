@@ -359,7 +359,7 @@ function toggle(id){if(isSel(id)){M.sel.splice(M.sel.indexOf(id),1);const w=wher
 /* Calificar: lo que movés es tu opinión (secreta) y se guarda sola. */
 function setMine(id,patch){if(!VOTACION_ABIERTA)return;ME.prof=ME.prof||{};let m=ME.prof[id];
   if(!m){m={};for(const[k]of ATTRS)m[k]=Math.max(-2,Math.min(2,Math.round(shown(id,k).v)-3));m.pos=shownPos(id).p;ME.prof[id]=m;}
-  else if(Object.keys(patch).every(k=>m[k]===patch[k]))return;
+  else if(Object.keys(patch).every(k=>m[k]===patch[k]&&m._t&&m._t[k]))return;
   if(!m._t)m._t={};for(const k in patch)m._t[k]=1;Object.assign(m,patch);editSeq++;ME.pDirty=true;ME.pending=true;vsave();scheduleSync(1500);updateRow(id);syncUI();}
 let bubT=null;function bub(el){document.querySelectorAll('.sl.show').forEach(x=>x!==el&&x.classList.remove('show'));el.classList.add('show');clearTimeout(bubT);bubT=setTimeout(()=>el.classList.remove('show'),1800);}
 const rows=$('rows');
