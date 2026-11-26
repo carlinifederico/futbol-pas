@@ -555,7 +555,7 @@ $('btnImg').onclick=async()=>{if(placed().length<10){toast('Completá los 10 pri
 $('imgCopy').onclick=()=>{try{navigator.clipboard.write([new ClipboardItem({'image/png':imgBlob})]).then(()=>toast('Imagen copiada'),()=>toast('Mantené apretada la imagen para copiarla'));}catch(e){toast('Mantené apretada la imagen para copiarla');}};
 
 /* ---------- Votación ---------- */
-const VOTE_URL='';
+const VOTE_URL='https://script.google.com/macros/s/AKfycbzgm8Th7cptkjrNWhp4TNohf3XzU4JRNTEkdRKkmIQ_ZCsn3i1OOg9qcg02I0Vo2gw5/exec';
 const VK='pas-votos-v1';
 let VS={players:{},voters:0},ME={id:null,who:null,notes:{},sent:false};
 function vload(){try{const d=JSON.parse(localStorage.getItem(VK)||'null');if(d){ME=Object.assign(ME,d.me||{});VS=d.vs||VS;}}catch(e){}
