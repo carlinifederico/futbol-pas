@@ -42,7 +42,7 @@ button,select,input{font:inherit;color:inherit}
 @media (max-width:390px){.acts{gap:4px}.btn{font-size:13px;padding:0 6px;letter-spacing:.01em}}
 .btn:focus-visible,.face:focus-visible,.sl:focus-visible,.pos button:focus-visible,select:focus-visible,input:focus-visible{outline:3px dashed var(--red);outline-offset:2px}
 /* ---- abajo ---- */
-.list{flex:1 1 auto;min-height:0;overflow-y:auto;overscroll-behavior:contain;-webkit-overflow-scrolling:touch;padding:0 10px calc(20px + env(safe-area-inset-bottom,0px))}
+.list{flex:1 1 auto;min-height:0;overflow-y:auto;overflow-x:hidden;overscroll-behavior:contain;-webkit-overflow-scrolling:touch;padding:0 10px calc(20px + env(safe-area-inset-bottom,0px))}
 .lhead{position:sticky;top:0;z-index:3;display:flex;align-items:center;gap:8px;padding:8px 0 7px;background:var(--paper);border-bottom:2px solid var(--ink)}
 .lhead b{white-space:nowrap;font-family:var(--display);font-weight:400;font-size:18px;text-transform:uppercase;letter-spacing:.02em}
 .cnt{display:inline-block;background:var(--ink);color:var(--mustard);padding:0 6px;margin-left:2px}
@@ -83,18 +83,24 @@ button,select,input{font:inherit;color:inherit}
 /* barrita: pista gruesa redondeada + perilla grande; touch-action pan-y = el scroll vertical sigue siendo de la lista */
 .sl{display:flex;flex-direction:column;cursor:pointer;touch-action:pan-y;user-select:none;-webkit-user-select:none;--th:24px}
 .sl .lb{display:flex;justify-content:space-between;font-size:11.5px;font-weight:600;color:var(--ink-soft)}
-.sl .lb b{font-size:12px;color:var(--ink);min-width:1ch;text-align:right}
+.sl .lb b{font-size:10.5px;color:var(--ink);min-width:1ch;text-align:right;white-space:nowrap}
 .sl .tr{position:relative;height:30px}
 .sl .tr::before{content:"";position:absolute;left:calc(var(--th)/2);right:calc(var(--th)/2);top:50%;height:8px;margin-top:-4px;border-radius:4px;background:rgba(27,33,64,.16)}
-.sl .tr i{position:absolute;left:calc(var(--th)/2);right:calc(var(--th)/2);top:50%;height:8px;margin-top:-4px;border-radius:4px;background:linear-gradient(90deg,#f2c94c,#3fae5a);clip-path:inset(0 calc((1 - var(--f))*100%) 0 0 round 4px)}
+.sl .tr i{position:absolute;left:calc(var(--th)/2);right:calc(var(--th)/2);top:50%;height:8px;margin-top:-4px;border-radius:4px;background:linear-gradient(90deg,#f2c94c,#3fae5a);clip-path:inset(0 calc((1 - var(--a))*100%) 0 0 round 4px)}
+.sl .tr s{position:absolute;top:50%;left:calc(var(--th)/2 + (100% - var(--th))*var(--a));width:3px;height:18px;margin:-9px 0 0 -1.5px;border-radius:2px;background:var(--ink)}
+.sl.noavg .tr i,.sl.noavg .tr s{display:none}
 .sl .tr u{position:absolute;top:50%;width:4px;height:4px;margin:-2px 0 0 -2px;border-radius:50%;background:rgba(27,33,64,.45)}
 .sl .tr u:nth-of-type(1){left:calc(var(--th)/2)}.sl .tr u:nth-of-type(2){left:calc(var(--th)/2 + (100% - var(--th))*.25)}.sl .tr u:nth-of-type(3){left:50%}
 .sl .tr u:nth-of-type(4){left:calc(var(--th)/2 + (100% - var(--th))*.75)}.sl .tr u:nth-of-type(5){left:calc(100% - var(--th)/2)}
-.sl .tr em{position:absolute;top:50%;left:calc(var(--th)/2 + (100% - var(--th))*var(--f));width:var(--th);height:var(--th);margin:calc(var(--th)/-2) 0 0 calc(var(--th)/-2);border-radius:50%;background:#fff;border:3px solid #3fae5a;border-color:color-mix(in srgb,#3fae5a calc(var(--f)*100%),#f2c94c);box-shadow:0 2px 4px rgba(0,0,0,.25);transition:transform .12s,left .12s}
+.sl .tr em{position:absolute;top:50%;left:calc(var(--th)/2 + (100% - var(--th))*var(--t));width:var(--th);height:var(--th);margin:calc(var(--th)/-2) 0 0 calc(var(--th)/-2);border-radius:50%;transition:transform .12s,left .12s;
+  background:rgba(255,255,255,.55);border:2px dashed rgba(27,33,64,.55)}
+.sl.mine .tr em{background:var(--ink);border:3px solid #fff;box-shadow:0 0 0 2px var(--ink),0 2px 5px rgba(0,0,0,.3)}
+.sl .tr b{position:absolute;bottom:calc(50% + var(--th)/2 + 4px);left:calc(var(--th)/2 + (100% - var(--th))*var(--t));transform:translateX(calc(var(--t)*-100%));z-index:4;white-space:nowrap;background:var(--ink);color:#fff;font-size:11px;font-weight:600;padding:3px 7px;border-radius:5px;pointer-events:none;opacity:0;transition:opacity .15s}
+.sl.drag .tr b,.sl.show .tr b{opacity:1}
 .sl.drag .tr em{transform:scale(1.18);transition:transform .12s}
-.sl.avg .tr i{opacity:.85}.sl.none .tr i{opacity:.35}
-.sl.none .tr em{border-color:rgba(27,33,64,.35)}
-.ctl.off .tr em{display:none}.ctl.off .tr i{display:none}
+
+
+.ctl.off .tr em,.ctl.off .tr i,.ctl.off .tr s,.ctl.off .tr b{display:none}
 .addf{display:flex;gap:6px;margin-top:12px}
 .addf input{flex:1;min-width:0;height:42px;border:2px solid var(--ink);border-radius:5px;background:#fff;padding:0 10px;font-size:16px}
 .rmv{width:40px;height:40px;border-radius:5px;border:1.5px solid var(--ink);background:#fff;cursor:pointer;flex:none}
@@ -309,8 +315,16 @@ function shown(id,k){const m=mineOf(id);if(m&&typeof m[k]==='number')return{v:m[
 function shownPos(id){const m=mineOf(id);if(m)return{p:POS_S.some(x=>x[0]===m.pos)?m.pos:'ANY',st:'mine'};const c=consensus(id),ok=c&&POS_S.some(x=>x[0]===c.pos);return{p:ok?c.pos:'ANY',st:ok?'avg':'none'};}
 function metaOf(p){if(p.custom)return['invitado',''];if(!VOTACION_ABIERTA)return['La votación arranca pronto',''];if(p.id===ME.who)return['sos vos',''];if(mineOf(p.id))return['✓ tu opinión','ok'];
   const pr=profOf(p.id);return[pr?`${pr.n} ${pr.n===1?'opinión':'opiniones'}`:'sin calificar',''];}
-function slHTML(id,k,full,name,off){const s=shown(id,k),v=Math.round(s.v);
-  return `<div class="sl ${s.st}" data-sl="${id}" data-k="${k}" role="slider" tabindex="${off?-1:0}"${off?' aria-disabled="true"':''} aria-label="${full} de ${esc(name)}" aria-valuemin="1" aria-valuemax="5" aria-valuenow="${v}" style="--f:${(s.v-1)/4}"><span class="lb">${full}<b>${off?'':v}</b></span><span class="tr"><i></i><u></u><u></u><u></u><u></u><u></u><em></em></span></div>`;}
+const fmt1=v=>String(Math.round(v*10)/10).replace('.',',');
+/* Una barrita, dos valores: el relleno y la marca = promedio del grupo; la perilla = tu voto (hueca si todavía no votaste). */
+function slInfo(id,k){const m=mineOf(id),pr=profOf(id),my=m&&typeof m[k]==='number'&&(!m._t||m._t[k])?m[k]+3:null,av=pr&&typeof pr[k]==='number'?pr[k]+3:null;
+  return{my,av,t:my??av??3,cls:'sl '+(my!=null?'mine':'ghost')+(av!=null?'':' noavg'),
+    short:my!=null?(av!=null?`vos ${my} · ${fmt1(av)}`:`vos ${my}`):(av!=null?fmt1(av):''),
+    full:[my!=null?`tu voto ${my}`:'',av!=null?`promedio ${fmt1(av)}`:''].filter(Boolean).join(' · ')||'sin votos'};}
+function slApply(el,o){el.style.setProperty('--t',(o.t-1)/4);el.style.setProperty('--a',o.av!=null?(o.av-1)/4:0);el.querySelector('.lb b').textContent=o.short;el.querySelector('.tr b').textContent=o.full;
+  el.setAttribute('aria-valuenow',Math.round(o.t));el.setAttribute('aria-valuetext',o.full);}
+function slHTML(id,k,full,name,off){const o=slInfo(id,k);
+  return `<div class="${o.cls}" data-sl="${id}" data-k="${k}" role="slider" tabindex="${off?-1:0}"${off?' aria-disabled="true"':''} aria-label="${full} de ${esc(name)}" aria-valuemin="1" aria-valuemax="5" aria-valuenow="${Math.round(o.t)}" aria-valuetext="${o.full}" style="--t:${(o.t-1)/4};--a:${o.av!=null?(o.av-1)/4:0}"><span class="lb">${full}<b>${off?'':o.short}</b></span><span class="tr"><i></i><u></u><u></u><u></u><u></u><u></u><s></s><em></em><b>${o.full}</b></span></div>`;}
 function rowHTML(p){const on=isSel(p.id),me=p.id===ME.who,cu=!!p.custom,ctl=!cu&&!me,off=!VOTACION_ABIERTA,sp=shownPos(p.id),[mt,mc]=metaOf(p);
   return `<div class="row${on?' on':''}${ctl?' vot':''}" data-row="${p.id}">
    <button type="button" class="face" data-pick="${p.id}" aria-pressed="${on}" aria-label="${esc(p.name)}: juega">${faceThumb(p)}<span class="ck">✓</span></button>
@@ -326,7 +340,7 @@ function renderList(){if(SL){listDirty=true;return;}listDirty=false;$('soy').par
 function updateRow(id){const r=document.querySelector(`[data-row="${id}"]`),p=P(id);if(!r||!p)return;const on=isSel(id);
   r.classList.toggle('on',on);r.querySelector('.face').setAttribute('aria-pressed',on);
   const[mt,mc]=metaOf(p),sm=r.querySelector('.nm small');sm.textContent=mt;sm.className=mc;if(!VOTACION_ABIERTA)return;
-  r.querySelectorAll('[data-sl]').forEach(el=>{const s=shown(id,el.dataset.k),v=Math.round(s.v);el.className='sl '+s.st+(SL&&SL.el===el&&SL.act?' drag':'');el.style.setProperty('--f',(s.v-1)/4);el.querySelector('.lb b').textContent=v;el.setAttribute('aria-valuenow',v);});
+  r.querySelectorAll('[data-sl]').forEach(el=>{const o=slInfo(id,el.dataset.k),keep=['drag','show'].filter(c=>el.classList.contains(c));el.className=o.cls+(keep.length?' '+keep.join(' '):'');slApply(el,o);});
   const sp=shownPos(id);r.querySelectorAll('[data-pos]').forEach(b=>{b.setAttribute('aria-pressed',b.dataset.p===sp.p);b.className=sp.st;});}
 
 /* Elegir / sacar: elegir no lo pone en la cancha; si ya está armada y hay un lugar libre, entra ahí. */
@@ -340,8 +354,9 @@ function toggle(id){if(isSel(id)){M.sel.splice(M.sel.indexOf(id),1);const w=wher
 function setMine(id,patch){if(!VOTACION_ABIERTA)return;ME.prof=ME.prof||{};let m=ME.prof[id];
   if(!m){m={};for(const[k]of ATTRS)m[k]=Math.max(-2,Math.min(2,Math.round(shown(id,k).v)-3));m.pos=shownPos(id).p;ME.prof[id]=m;}
   else if(Object.keys(patch).every(k=>m[k]===patch[k]))return;
-  Object.assign(m,patch);ME.pDirty=true;ME.pending=true;vsave();scheduleSync(1500);updateRow(id);syncUI();}
-function slSet(el,x){const tr=el.querySelector('.tr').getBoundingClientRect(),v=Math.max(1,Math.min(5,1+Math.round((x-tr.left-14)/Math.max(1,tr.width-28)*4)));setMine(el.dataset.sl,{[el.dataset.k]:v-3});}
+  if(!m._t)m._t={};for(const k in patch)m._t[k]=1;Object.assign(m,patch);ME.pDirty=true;ME.pending=true;vsave();scheduleSync(1500);updateRow(id);syncUI();}
+let bubT=null;function bub(el){document.querySelectorAll('.sl.show').forEach(x=>x!==el&&x.classList.remove('show'));el.classList.add('show');clearTimeout(bubT);bubT=setTimeout(()=>el.classList.remove('show'),1800);}
+function slSet(el,x){bub(el);const tr=el.querySelector('.tr').getBoundingClientRect(),v=Math.max(1,Math.min(5,1+Math.round((x-tr.left-14)/Math.max(1,tr.width-28)*4)));setMine(el.dataset.sl,{[el.dataset.k]:v-3});}
 const rows=$('rows');
 rows.addEventListener('click',e=>{const b=e.target.closest('[data-pick],[data-pos],[data-rm]');if(!b)return;
   if(b.dataset.pick)toggle(b.dataset.pick);
@@ -356,7 +371,7 @@ rows.addEventListener('pointermove',e=>{if(!SL||e.pointerId!==SL.pid)return;cons
 function slEnd(e,cancel){if(!SL||e.pointerId!==SL.pid)return;const s=SL;SL=null;s.el.classList.remove('drag');if(!cancel&&!s.act&&Math.abs(e.clientY-s.y)<10&&Math.abs(e.clientX-s.x)<10)slSet(s.el,e.clientX);if(listDirty)renderList();}
 rows.addEventListener('pointerup',e=>slEnd(e,false));
 rows.addEventListener('pointercancel',e=>slEnd(e,true));
-rows.addEventListener('keydown',e=>{const el=e.target.closest('[data-sl]');if(!el||!VOTACION_ABIERTA)return;const cur=Math.round(shown(el.dataset.sl,el.dataset.k).v);
+rows.addEventListener('keydown',e=>{const el=e.target.closest('[data-sl]');if(!el||!VOTACION_ABIERTA)return;const cur=Math.round(slInfo(el.dataset.sl,el.dataset.k).t);bub(el);
   const nv={ArrowRight:cur+1,ArrowUp:cur+1,ArrowLeft:cur-1,ArrowDown:cur-1,Home:1,End:5}[e.key];if(nv===undefined)return;e.preventDefault();setMine(el.dataset.sl,{[el.dataset.k]:Math.max(1,Math.min(5,nv))-3});});
 $('soy').onchange=e=>{ME.who=e.target.value;if(ME.who&&ME.prof)delete ME.prof[ME.who];vsave();renderList();};
 $('addFrm').addEventListener('submit',e=>{e.preventDefault();const name=$('aName').value.trim();if(!name)return;
@@ -428,7 +443,7 @@ async function fetchVotes(){if(!VOTACION_ABIERTA||!VOTE_URL)return;try{const r=a
 let syncTimer=null,syncing=false,syncFails=0,syncState='';
 function scheduleSync(ms){clearTimeout(syncTimer);syncTimer=setTimeout(syncVotes,ms);}
 async function syncVotes(){if(!VOTACION_ABIERTA||!VOTE_URL||!ME.pending)return;if(syncing){scheduleSync(1200);return;}
-  const votes={},profile={};if(ME.pDirty)for(const k in ME.prof||{})if(k!==ME.who&&P(k)&&!P(k).custom)profile[k]=ME.prof[k];
+  const votes={},profile={};if(ME.pDirty)for(const k in ME.prof||{})if(k!==ME.who&&P(k)&&!P(k).custom){const{_t,...o}=ME.prof[k];profile[k]=o;}
   if(!Object.keys(profile).length){ME.pending=false;vsave();syncUI();return;}
   syncing=true;syncState='saving';syncUI();
   try{const r=await fetch(VOTE_URL,{method:'POST',body:JSON.stringify({voter:ME.id,who:ME.who||'',votes,profile})});const d=await r.json();
