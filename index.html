@@ -44,6 +44,10 @@ button,select,input{font:inherit}
 .meter .head{display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap}
 .meter .head b{font-family:var(--display);font-weight:400;font-size:20px;letter-spacing:.04em;text-transform:uppercase}
 .stampv{font-family:var(--type);font-weight:700;font-size:13px;text-transform:uppercase;border:2.5px solid currentColor;padding:2px 9px;transform:rotate(-3deg)}
+.mlabel{display:block;font-family:var(--type);font-size:12px;font-weight:700;letter-spacing:.08em;color:var(--mustard);text-transform:uppercase;margin-bottom:2px}
+.scale{display:flex;justify-content:space-between;gap:6px;font-family:var(--type);font-size:11px;color:rgba(247,241,222,.75)}
+.scale .mid{color:var(--mustard);font-weight:700;text-align:center}
+@media (max-width:420px){.scale span:not(.mid){font-size:10px}}
 .track{position:relative;height:34px;display:flex;border:2px solid var(--chalk);overflow:hidden}
 .track i{display:flex;align-items:center;font-style:normal;font-family:var(--display);font-size:17px;letter-spacing:.03em;transition:width .45s cubic-bezier(.3,1.4,.5,1);white-space:nowrap;overflow:hidden}
 .track .a{background:var(--navy-shirt);color:var(--chalk);justify-content:flex-start;padding-left:8px;background-image:repeating-linear-gradient(135deg,transparent 0 6px,rgba(255,255,255,.06) 6px 12px)}
@@ -225,8 +229,9 @@ body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset
   <div class="desk">
     <section class="col" aria-label="Cancha">
       <div class="meter" id="meter" aria-live="polite">
-        <div class="head"><b id="mTitle">Balance</b><span class="stampv" id="mStamp"></span></div>
+        <div class="head"><b><span class="mlabel">Balance de los equipos</span><span id="mTitle"></span></b><span class="stampv" id="mStamp"></span></div>
         <div class="track"><i class="a" id="barA"></i><i class="b" id="barB"></i></div>
+        <div class="scale"><span>◀ Más fuertes los Oscuros</span><span class="mid">50/50 = parejo</span><span>Más fuertes los Claros ▶</span></div>
         <div class="tip" id="tip" hidden><span id="tipTxt"></span><button class="btn small" id="tipGo">Aplicar</button></div>
       </div>
       <div class="actions">
@@ -262,7 +267,7 @@ body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset
   </section>
 
   <section id="v-votar" hidden>
-    <div class="top"><div><h1>Votá a tus compañeros</h1><p class="sub">Del 1 al 10, sin registrarte. Podés cambiar tus notas cuando quieras: vale la última.</p></div></div>
+    <div class="top"><div><h1>Votá a tus compañeros</h1><p class="sub">De 1 a 5 estrellas, sin registrarte. 🔒 Tu voto es secreto: tu celular genera una clave propia y nadie puede ver qué votaste, ni siquiera el organizador. Podés cambiarlo cuando quieras: vale el último.</p></div></div>
     <div id="whoBox" class="col" style="margin-top:14px">
       <span class="stephead"><span class="num">1</span>¿Quién sos?</span>
       <p class="hint" style="margin:0">Elegí tu figurita (así no te votás a vos mismo). Si no estás, tocá "Soy invitado".</p>
@@ -584,7 +589,7 @@ $('btnImg').onclick=async()=>{if(placed().length<10){toast('Completá los 10 pri
 $('imgCopy').onclick=()=>{try{navigator.clipboard.write([new ClipboardItem({'image/png':imgBlob})]).then(()=>toast('Imagen copiada'),()=>toast('Mantené apretada la imagen para copiarla'));}catch(e){toast('Mantené apretada la imagen para copiarla');}};
 
 /* ---------- Votación ---------- */
-const VOTE_URL='https://script.google.com/macros/s/AKfycbzgm8Th7cptkjrNWhp4TNohf3XzU4JRNTEkdRKkmIQ_ZCsn3i1OOg9qcg02I0Vo2gw5/exec';
+const VOTE_URL='https://script.google.com/macros/s/AKfycbzELKhJomhoqm93U8o7ueskgDl-ikr8EzPYUgSbEZb4RCgQUU5z5gg0BPFebgbnJ9JR/exec';
 const VK='pas-votos-v1';
 let VS={players:{},voters:0},ME={id:null,who:null,stars:{},pos:{},sent:false};
 function vload(){try{const d=JSON.parse(localStorage.getItem(VK)||'null');if(d){ME=Object.assign(ME,d.me||{});VS=d.vs||VS;}}catch(e){}
@@ -608,14 +613,25 @@ $('vgrid').addEventListener('click',e=>{const b=e.target.closest('button');if(!b
   if(b.dataset.n){const id=b.dataset.v,n=+b.dataset.n;ME.stars[id]=ME.stars[id]===n?0:n;if(!ME.stars[id])delete ME.stars[id];}
   else if(b.dataset.p){const id=b.dataset.pv;ME.pos[id]=ME.pos[id]===b.dataset.p?undefined:b.dataset.p;if(!ME.pos[id])delete ME.pos[id];}
   else return;
-  ME.sent=false;vsave();const id=b.dataset.v||b.dataset.pv;const card=b.closest('.vcard');card.outerHTML=cardHTML(P(id));voteProg();});
-function voteProg(){const c=Object.keys(ME.stars).filter(k=>k!==ME.who).length;$('voteProg').textContent=`${c} de ${votables().length} con estrellas${ME.sent?' · enviados ✓':''}`;
-  $('btnSend').disabled=!c||!VOTE_URL;$('btnSend').textContent=VOTE_URL?(ME.sent?'Volver a enviar':'Enviar mis votos'):'Votación en preparación';}
+  ME.sent=false;ME.pending=true;vsave();const id=b.dataset.v||b.dataset.pv;const card=b.closest('.vcard');card.outerHTML=cardHTML(P(id));scheduleSync(1500);voteProg();});
+/* Guardado automático: cada estrella se manda sola unos segundos después; si no hay señal, queda pendiente y se reintenta. */
+let syncTimer=null,syncing=false,syncFails=0,syncState='';
+function scheduleSync(ms){clearTimeout(syncTimer);syncTimer=setTimeout(syncVotes,ms);}
+async function syncVotes(){if(!VOTE_URL||!ME.pending)return;if(syncing){scheduleSync(1200);return;}
+  const votes={};for(const[k,v]of Object.entries(ME.stars))if(k!==ME.who)votes[k]=v*2;
+  if(!Object.keys(votes).length){ME.pending=false;vsave();voteProg();return;}
+  syncing=true;syncState='saving';voteProg();
+  try{const r=await fetch(VOTE_URL,{method:'POST',body:JSON.stringify({voter:ME.id,who:ME.who||'',votes})});const d=await r.json();
+    if(d&&d.players)VS=d;ME.sent=true;ME.pending=false;syncFails=0;syncState='ok';vsave();route&&(document.getElementById('voteDot').hidden=true,document.getElementById('voteBanner').hidden=true);}
+  catch(e){syncFails++;syncState='retry';scheduleSync(Math.min(60000,4000*syncFails));}
+  finally{syncing=false;voteProg();}}
+window.addEventListener('online',()=>{if(ME.pending)scheduleSync(500);});
+function voteProg(){const c=Object.keys(ME.stars).filter(k=>k!==ME.who).length,tot=votables().length;
+  const st=!VOTE_URL?'Votación en preparación':syncState==='saving'?'Guardando…':syncState==='retry'?'Sin señal: se guarda solo cuando vuelva':ME.pending?'Guardando…':ME.sent?'✓ Guardado':'Se guarda solo al tocar';
+  $('voteProg').textContent=`${c} de ${tot} con estrellas · ${st}`;
+  $('btnSend').disabled=false;$('btnSend').textContent=c>=tot?'¡Listo! Ver ranking':'Ver ranking';}
 $('btnWho').onclick=()=>{ME.who=null;vsave();renderVotar();};
-$('btnSend').onclick=async()=>{const votes={},pos={};for(const[k,v]of Object.entries(ME.stars))if(k!==ME.who)votes[k]=v*2;for(const[k,v]of Object.entries(ME.pos))if(k!==ME.who)pos[k]=v;
-  $('btnSend').disabled=true;$('btnSend').textContent='Enviando…';
-  try{const r=await fetch(VOTE_URL,{method:'POST',body:JSON.stringify({voter:ME.id,who:ME.who||'',votes,pos})});const d=await r.json();if(d&&d.players)VS=d;ME.sent=true;vsave();toast('¡Votos enviados!');location.hash='ranking';}
-  catch(e){toast('No se pudo enviar. Probá de nuevo en un rato.');voteProg();}};
+$('btnSend').onclick=()=>{if(ME.pending)syncVotes();location.hash='ranking';};
 function renderRanking(){const rows=ROSTER.map(p=>{const v=VS.players&&VS.players[p.id];return{p,avg:v&&v.c?v.s/v.c:null,c:v?v.c:0};}).filter(r=>r.avg!==null).sort((a,b)=>b.avg-a.avg||b.c-a.c);
   $('rankSub').textContent=VS.voters?`Con los votos de ${VS.voters} ${VS.voters===1?'persona':'personas'}.`:'Todavía no votó nadie. ¡Arrancá vos!';
   const top=rows.slice(0,3),order=[1,0,2],cols=['#e2b93b','#c9ced6','#c98b52'];
@@ -634,7 +650,7 @@ function route(){const h=(location.hash||'#armar').slice(1);view=['armar','votar
 window.addEventListener('hashchange',()=>{route();window.scrollTo(0,0);});
 $('btnHelp').onclick=()=>$('guideDlg').showModal();
 
-load();vload();syncInputs();render();route();fetchVotes();
+load();vload();syncInputs();render();route();fetchVotes();if(ME.pending)scheduleSync(2000);
 try{if(!localStorage.getItem('pas-guia-vista')){$('guideDlg').showModal();localStorage.setItem('pas-guia-vista','1');}}catch(e){}
 
 </script>
