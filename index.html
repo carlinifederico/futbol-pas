@@ -70,10 +70,21 @@ button,select,input{font:inherit}
 .bcard:hover .fig::after{background-position:-30% 0}
 .bcard .fig img,.bcard .fig svg{width:100%;height:100%;object-fit:cover;object-position:50% 100%;display:block;pointer-events:none}
 .bcard .nm{font-family:var(--display);font-size:17px;text-transform:uppercase;line-height:1.05;overflow-wrap:anywhere}
-.bcard.in .fig{outline:5px solid var(--mustard);outline-offset:-1px;transform:rotate(0)}
-.bcard .chk{position:absolute;right:-8px;top:58%;transform:rotate(-9deg);background:var(--red);color:#fff;font-family:var(--display);font-size:13px;letter-spacing:.06em;
-  padding:2px 8px;border:3px solid var(--chalk);box-shadow:0 4px 10px rgba(0,0,0,.35);z-index:1;pointer-events:none}
+.bcard.in .fig{outline:6px solid var(--ok);outline-offset:-1px;transform:rotate(0) scale(1.03)}
+.bcard .chk{position:absolute;left:-4px;right:-4px;bottom:26px;transform:rotate(-3deg);background:var(--ok);color:#fff;font-family:var(--display);font-size:15px;letter-spacing:.06em;text-align:center;
+  padding:3px 4px;border:3px solid var(--chalk);box-shadow:0 4px 10px rgba(0,0,0,.35);z-index:1;pointer-events:none}
 .bcard:not(.in) .chk{display:none}
+.bench.has .bcard:not(.in) .fig{filter:grayscale(.75) brightness(.95);opacity:.62}
+.bench.has .bcard:not(.in):hover .fig{filter:none;opacity:1}
+.bcard.in .nm{color:var(--ok)}
+.conv{display:grid;grid-template-columns:repeat(10,minmax(0,1fr));gap:6px;background:var(--ink);padding:8px;border:3px solid var(--ink)}
+@media (max-width:560px){.conv{grid-template-columns:repeat(5,minmax(0,1fr))}}
+.conv .c{position:relative;aspect-ratio:1;border:2px dashed rgba(247,241,222,.45);display:grid;place-items:center;font-family:var(--display);font-size:18px;color:rgba(247,241,222,.45);overflow:hidden;background:none;padding:0}
+.conv .c.f{border:2px solid var(--ok);cursor:pointer}
+.conv .c img,.conv .c svg{width:100%;height:100%;object-fit:cover}
+.conv .c .x{position:absolute;right:1px;top:1px;background:var(--red);color:#fff;font-family:var(--type);font-weight:700;font-size:10px;line-height:1;padding:1px 3px;opacity:0}
+.conv .c.f:hover .x,.conv .c.f:focus-visible .x{opacity:1}
+.convlbl{font-family:var(--type);font-size:12px;font-weight:700;color:var(--ink-soft)}
 .stephead{display:flex;align-items:center;gap:10px;font-family:var(--display);font-size:clamp(24px,3.4vw,32px);text-transform:uppercase;line-height:1}
 .stephead .num{display:grid;place-items:center;width:1.35em;height:1.35em;border-radius:50%;background:var(--red);color:var(--chalk);font-size:.8em;flex:none}
 .cnt{font-family:var(--display);font-size:30px;line-height:1;background:var(--ink);color:var(--mustard);padding:2px 10px}
@@ -93,7 +104,10 @@ button,select,input{font:inherit}
 @media (max-width:900px){.plantel{order:-1}}
 .bcard .tag{position:absolute;top:-7px;left:-5px;font-family:var(--display);font-size:11px;letter-spacing:.04em;padding:1px 6px;border:2px solid var(--ink);transform:rotate(-6deg);z-index:1}
 .bcard .tag.A{background:var(--navy-shirt);color:var(--chalk)} .bcard .tag.B{background:var(--white-shirt)}
-.bcard .info{position:absolute;top:-8px;right:-6px;width:26px;height:26px;border-radius:50%;border:2px solid var(--ink);background:var(--mustard);font-family:var(--display);font-size:14px;cursor:pointer;z-index:1;display:grid;place-items:center;padding:0}
+.bcard .info{position:absolute;top:-10px;right:-8px;height:30px;min-width:44px;padding:0 8px;border-radius:15px;border:2.5px solid var(--ink);background:var(--mustard);color:var(--ink);
+  font-family:var(--display);font-size:20px;line-height:1;letter-spacing:1px;cursor:pointer;z-index:2;display:grid;place-items:center;box-shadow:2px 2px 0 var(--ink)}
+.bcard .info:hover{background:var(--chalk)}
+.bcard .info:focus-visible{outline:3px dashed var(--red);outline-offset:2px}
 .add{display:grid;place-items:center;aspect-ratio:3/3.65;border:2.5px dashed var(--ink);background:transparent;cursor:pointer;font-family:var(--display);font-size:15px;text-transform:uppercase;color:var(--ink);padding:6px;text-align:center}
 .add b{display:block;font-size:40px;line-height:1}
 .custom-face{position:relative;width:100%;height:100%;background:#2c3560}
@@ -145,10 +159,17 @@ body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset
 .vcard .fig{aspect-ratio:3/3.65;background:#fff;padding:4px;box-shadow:0 12px 20px -8px rgba(27,33,64,.55);transform:rotate(var(--rot,0deg));overflow:hidden}
 .vcard .fig img,.vcard .fig svg{width:100%;height:100%;object-fit:cover;object-position:50% 100%;display:block}
 .vcard.done .fig{outline:5px solid var(--mustard);outline-offset:-1px}
-.notes{display:grid;grid-template-columns:repeat(5,1fr);gap:4px}
-.notes button{font-family:var(--display);font-size:17px;padding:4px 0;border:2px solid var(--ink);background:#fff;color:var(--ink);cursor:pointer}
-.notes button[aria-pressed="true"]{background:var(--ink);color:var(--mustard);transform:scale(1.08)}
-.notelbl{font-family:var(--type);font-size:12px;font-weight:700;min-height:1.3em;color:var(--red)}
+.stars{display:flex;justify-content:space-between;gap:2px}
+.stars button{flex:1;background:none;border:0;padding:0;cursor:pointer;font-size:clamp(26px,4.4vw,34px);line-height:1;color:#cdbf9d;transition:transform .1s}
+.stars button.on{color:var(--mustard);text-shadow:1px 1px 0 var(--ink),-1px -1px 0 var(--ink),1px -1px 0 var(--ink),-1px 1px 0 var(--ink)}
+.stars button:hover{transform:scale(1.15)}
+.stars button:focus-visible{outline:3px dashed var(--red);outline-offset:2px}
+.vpos{display:flex;flex-wrap:wrap;gap:4px}
+.vpos button{font-family:var(--type);font-weight:700;font-size:11.5px;padding:2px 6px;border:1.5px solid var(--ink);background:#fff;color:var(--ink);cursor:pointer}
+.vpos button[aria-pressed="true"]{background:var(--ink);color:var(--mustard)}
+.vpos-l{font-family:var(--type);font-size:11px;color:var(--ink-soft)}
+.rstars{position:relative;display:inline-block;font-size:clamp(22px,4vw,30px);line-height:1;letter-spacing:2px;color:#cdbf9d;white-space:nowrap}
+.rstars i{position:absolute;inset:0 auto 0 0;overflow:hidden;font-style:normal;color:var(--mustard);text-shadow:1px 1px 0 var(--ink),-1px -1px 0 var(--ink),1px -1px 0 var(--ink),-1px 1px 0 var(--ink)}
 .whogrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(96px,1fr));gap:14px 10px}
 .who{background:none;border:0;padding:0;cursor:pointer;display:flex;flex-direction:column;gap:4px;color:var(--ink);text-align:left}
 .who .fig{display:block;aspect-ratio:3/3.65;background:#fff;padding:3px;box-shadow:0 6px 12px -6px rgba(0,0,0,.5);overflow:hidden}
@@ -165,7 +186,7 @@ body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset
 .pod .step{width:100%;background:var(--ink);color:var(--mustard);font-family:var(--display);text-align:center;font-size:clamp(14px,2.4vw,20px);padding:6px 4px;line-height:1.15;overflow-wrap:anywhere}
 .pod.p1 .step{padding-block:22px}.pod.p2 .step{padding-block:12px}
 .rlist{display:flex;flex-direction:column;gap:8px;max-width:720px;margin-inline:auto;width:100%}
-.rrow{display:grid;grid-template-columns:34px 52px minmax(0,1fr) auto;gap:10px;align-items:center;background:var(--card);border:2px solid var(--ink);padding:6px 10px}
+.rrow{display:grid;grid-template-columns:34px 52px minmax(0,1fr);gap:10px;align-items:center;background:var(--card);border:2px solid var(--ink);padding:6px 10px}
 .rrow .pos{font-family:var(--display);font-size:22px;color:var(--red)}
 .rrow .mini{display:block;width:52px;aspect-ratio:3/3.65;background:#fff;padding:2px;overflow:hidden}
 .rrow .mini img,.rrow .mini svg{width:100%;height:100%;object-fit:cover;object-position:50% 100%}
@@ -226,7 +247,9 @@ body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset
     <section class="col plantel" aria-label="Plantel">
       <div class="benchbox" id="benchbox" data-drop="bench">
         <div class="bar" style="justify-content:space-between"><span class="stephead"><span class="num">1</span>¿Quiénes juegan?</span><span class="cnt" id="count"></span></div>
-        <p class="hint" style="margin:0">Tocá las figuritas de los 10 que juegan (otra vez para sacarlos). Con la <b>i</b> marcás posición y cómo juega. Después tocá <b>Armar parejos</b>.</p>
+        <p class="hint" style="margin:0">Tocá las figuritas de los 10 que juegan (otra vez para sacarlos). Con el botón <b>•••</b> abrís la ficha del jugador: posición y cómo juega. Después tocá <b>Armar parejos</b>.</p>
+        <span class="convlbl">CONVOCADOS (tocá una cara para sacarlo)</span>
+        <div class="conv" id="conv"></div>
         <div class="bench" id="bench"></div>
       </div>
       <div class="saved" id="savedWrap" hidden>
@@ -246,8 +269,8 @@ body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset
       <div class="whogrid" id="whoGrid"></div>
     </div>
     <div id="voteBox" class="col" style="margin-top:14px" hidden>
-      <div class="bar" style="justify-content:space-between"><span class="stephead"><span class="num">2</span>Poneles nota</span><button class="btn small" id="btnWho">Cambiar quién soy</button></div>
-      <p class="hint" style="margin:0">1–3 Tronco · 4–6 Cumple · 7–8 Crack · 9–10 Leyenda del potrero</p>
+      <div class="bar" style="justify-content:space-between"><span class="stephead"><span class="num">2</span>Poneles estrellas</span><button class="btn small" id="btnWho">Cambiar quién soy</button></div>
+      <p class="hint" style="margin:0">De 1 a 5 estrellas. Tocá de nuevo la misma estrella para borrarla.</p>
       <div class="vgrid" id="vgrid"></div>
       <div class="sendbar"><b id="voteProg">0 notas</b><button class="btn primary" id="btnSend">Enviar mis votos</button></div>
     </div>
@@ -266,7 +289,7 @@ body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset
   <form method="dialog">
     <h2 style="font-family:var(--display);font-weight:400;font-size:34px;text-transform:uppercase;margin:0;line-height:1">Bienvenido a Fútbol PAS</h2>
     <ol class="gsteps">
-      <li><span class="n">1</span><div><b>Convocá a los 10</b><p>En "Armar partido", tocá las figuritas de los que juegan. Con la <b>i</b> marcás si ataja, dónde juega y cómo.</p></div></li>
+      <li><span class="n">1</span><div><b>Convocá a los 10</b><p>En "Armar partido", tocá las figuritas de los que juegan. Con el botón <b>•••</b> de cada figurita abrís su ficha: si ataja, dónde juega y cómo.</p></div></li>
       <li><span class="n">2</span><div><b>Armar parejos</b><p>El botón amarillo reparte a los 10 en remera oscura y remera clara. ¿No te gusta? Tocá "Otra opción" o arrastrá figuritas para cambiarlas.</p></div></li>
       <li><span class="n">3</span><div><b>Compartí la cancha</b><p>Con "Compartir imagen" la mandás al grupo de WhatsApp.</p></div></li>
       <li><span class="n">4</span><div><b>Votá y mirá el ranking</b><p>Poné nota del 1 al 10 a cada uno. Los votos de todos arman el Ranking PAS y ayudan a que los equipos salgan más parejos.</p></div></li>
@@ -354,7 +377,8 @@ function figHTML(p){if(p.photo)return `<div class="custom-face"><img src="${esc(
   const c=cardImg(p);return c?`<img src="${esc(c)}" alt="Figurita de ${esc(p.name)}" draggable="false" loading="lazy">`:incognito(p);}
 
 /* ---------- Estado de la cancha ---------- */
-const det=id=>M.det[id]||(M.det[id]={pos:'ANY',tr:[],lvl:'5.5'});
+const votedPos=id=>{const v=VS.players&&VS.players[id];if(!v||!v.pos)return null;let best=null,n=0;for(const k in v.pos)if(v.pos[k]>n){n=v.pos[k];best=k;}return best;};
+const det=id=>M.det[id]||(M.det[id]={pos:votedPos(id)||'ANY',tr:[],lvl:'5.5'});
 const get=(k,s)=>s<0?M[k].gk:M[k].s[s];
 function set(k,s,id){if(s<0)M[k].gk=id;else M[k].s[s]=id;}
 function where(id){for(const k of['A','B']){if(M[k].gk===id)return{k,s:-1};const i=M[k].s.indexOf(id);if(i>=0)return{k,s:i};}return null;}
@@ -454,10 +478,14 @@ function renderBench(){const c=M.sel.length,armed=placed().length===10;$('count'
   $('btnAuto').disabled=c!==10;$('btnOther').disabled=!armed;
   $('autoSub').textContent=c===10?(armed?'Volver a repartir desde cero':'Reparte a los 10 en la cancha, parejos'):`Primero convocá a los 10 (faltan ${10-c})`;
   $('otherSub').textContent=armed?(opts.length>1?`Vas por la ${optIdx+1} de ${opts.length}`:'Otra combinación igual de pareja'):'Se habilita después de armar';
+  $('conv').innerHTML=Array.from({length:10},(_,i)=>{const id=M.sel[i],p=id&&P(id);if(!p)return `<span class="c">${i+1}</span>`;const f=faceImg(p);
+    return `<button type="button" class="c f" data-unsel="${p.id}" title="Sacar a ${esc(p.name)}" aria-label="Sacar a ${esc(p.name)}">${f?`<img src="${esc(f)}" alt="">`:incognito(p)}<span class="x">✕</span></button>`;}).join('');
+  $('conv').querySelectorAll('[data-unsel]').forEach(b=>b.onclick=()=>removeFromPitch(b.dataset.unsel));
+  $('bench').classList.toggle('has',c>0);
   $('bench').innerHTML=all().map(p=>{const w=where(p.id);
     const on=isSel(p.id);
     return `<div class="bcard${on?' in':''}" data-drag="${p.id}" tabindex="0" role="button" aria-pressed="${on}" aria-label="${esc(p.name)}${on?', convocado':''}">
-      ${w?`<span class="tag ${w.k}">${TEAM[w.k].name}</span>`:''}<span class="chk">✓ JUEGA</span><button type="button" class="info" data-info="${p.id}" aria-label="Detalles de ${esc(p.name)}">i</button>
+      ${w?`<span class="tag ${w.k}">${TEAM[w.k].name}</span>`:''}<span class="chk">✓ CONVOCADO</span><button type="button" class="info" data-info="${p.id}" aria-label="Ficha de ${esc(p.name)}: posición y cómo juega" title="Ficha del jugador">•••</button>
       <span class="fig" style="--rot:${rot(p.id)*.6}deg">${figHTML(p)}</span><span class="nm">${esc(p.name)}</span></div>`;}).join('')+
     `<button type="button" class="add" id="btnAdd"><span><b>+</b>Sumar jugador</span></button>`;
   $('btnAdd').onclick=openAdd;}
@@ -557,40 +585,42 @@ $('imgCopy').onclick=()=>{try{navigator.clipboard.write([new ClipboardItem({'ima
 /* ---------- Votación ---------- */
 const VOTE_URL='https://script.google.com/macros/s/AKfycbzgm8Th7cptkjrNWhp4TNohf3XzU4JRNTEkdRKkmIQ_ZCsn3i1OOg9qcg02I0Vo2gw5/exec';
 const VK='pas-votos-v1';
-let VS={players:{},voters:0},ME={id:null,who:null,notes:{},sent:false};
+let VS={players:{},voters:0},ME={id:null,who:null,stars:{},pos:{},sent:false};
 function vload(){try{const d=JSON.parse(localStorage.getItem(VK)||'null');if(d){ME=Object.assign(ME,d.me||{});VS=d.vs||VS;}}catch(e){}
+  ME.stars=ME.stars||{};ME.pos=ME.pos||{};delete ME.notes;
   if(!ME.id){ME.id=Array.from(crypto.getRandomValues(new Uint8Array(12)),b=>'abcdefghijkmnpqrstuvwxyz23456789'[b%32]).join('');vsave();}}
 function vsave(){try{localStorage.setItem(VK,JSON.stringify({me:ME,vs:VS}));}catch(e){}}
 const votables=()=>ROSTER.filter(p=>p.id!==ME.who);
-const NOTE_LBL=n=>n<=3?'Tronco':n<=6?'Cumple':n<=8?'Crack':'Leyenda del potrero';
-const fmt1=n=>n.toFixed(1).replace('.',',');
+const VPOS=[['ARQ','Arquero'],['DEF','Defensa'],['MED','Medio'],['DEL','Delantero']];
+const starsHTML=avg10=>{const pct=Math.max(0,Math.min(100,avg10*10));return `<span class="rstars" aria-label="${(avg10/2).toFixed(1)} de 5 estrellas">★★★★★<i style="width:${pct}%">★★★★★</i></span>`;};
 async function fetchVotes(){if(!VOTE_URL)return;try{const r=await fetch(VOTE_URL);const d=await r.json();if(d&&d.players){VS=d;vsave();renderMeter();if(view==='ranking')renderRanking();}}catch(e){}}
 function renderWho(){$('whoGrid').innerHTML=ROSTER.map(p=>`<button type="button" class="who" data-who="${p.id}"><span class="fig">${figHTML(p)}</span><span>${esc(p.name)}</span></button>`).join('')+
   `<button type="button" class="who" data-who="guest"><span class="fig" style="display:grid;place-items:center;font-family:var(--display);font-size:40px">?</span><span>Soy invitado</span></button>`;
-  $('whoGrid').querySelectorAll('[data-who]').forEach(b=>b.onclick=()=>{ME.who=b.dataset.who==='guest'?'':b.dataset.who;delete ME.notes[ME.who];vsave();renderVotar();window.scrollTo(0,0);});}
+  $('whoGrid').querySelectorAll('[data-who]').forEach(b=>b.onclick=()=>{ME.who=b.dataset.who==='guest'?'':b.dataset.who;delete ME.stars[ME.who];delete ME.pos[ME.who];vsave();renderVotar();window.scrollTo(0,0);});}
+function cardHTML(p){const n=ME.stars[p.id]||0,ps=ME.pos[p.id];
+  return `<div class="vcard${n?' done':''}" data-card="${p.id}"><span class="fig" style="--rot:${rot(p.id)*.6}deg">${figHTML(p)}</span>
+    <div class="stars" role="group" aria-label="Estrellas para ${esc(p.name)}">${[1,2,3,4,5].map(k=>`<button type="button" data-v="${p.id}" data-n="${k}" class="${k<=n?'on':''}" aria-label="${k} ${k===1?'estrella':'estrellas'}" aria-pressed="${n===k}">★</button>`).join('')}</div></div>`;}
 function renderVotar(){const chose=ME.who!==null;$('whoBox').hidden=chose;$('voteBox').hidden=!chose;
   if(!chose){renderWho();return;}
-  $('vgrid').innerHTML=votables().map(p=>{const n=ME.notes[p.id];return `<div class="vcard${n?' done':''}"><span class="fig" style="--rot:${rot(p.id)*.6}deg">${figHTML(p)}</span>
-    <div class="notes" role="group" aria-label="Nota para ${esc(p.name)}">${[1,2,3,4,5,6,7,8,9,10].map(k=>`<button type="button" data-v="${p.id}" data-n="${k}" aria-pressed="${n===k}">${k}</button>`).join('')}</div>
-    <span class="notelbl">${n?NOTE_LBL(n):''}</span></div>`;}).join('');
-  $('vgrid').querySelectorAll('[data-n]').forEach(b=>b.onclick=()=>{ME.notes[b.dataset.v]=+b.dataset.n;ME.sent=false;vsave();
-    const card=b.closest('.vcard');card.classList.add('done');card.querySelectorAll('[data-n]').forEach(x=>x.setAttribute('aria-pressed',x===b));
-    card.querySelector('.notelbl').textContent=NOTE_LBL(+b.dataset.n);voteProg();});
-  voteProg();}
-function voteProg(){const c=Object.keys(ME.notes).filter(k=>k!==ME.who).length;$('voteProg').textContent=`${c} de ${votables().length} con nota${ME.sent?' · enviados ✓':''}`;
+  $('vgrid').innerHTML=votables().map(cardHTML).join('');voteProg();}
+$('vgrid').addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;
+  if(b.dataset.n){const id=b.dataset.v,n=+b.dataset.n;ME.stars[id]=ME.stars[id]===n?0:n;if(!ME.stars[id])delete ME.stars[id];}
+  else if(b.dataset.p){const id=b.dataset.pv;ME.pos[id]=ME.pos[id]===b.dataset.p?undefined:b.dataset.p;if(!ME.pos[id])delete ME.pos[id];}
+  else return;
+  ME.sent=false;vsave();const id=b.dataset.v||b.dataset.pv;const card=b.closest('.vcard');card.outerHTML=cardHTML(P(id));voteProg();});
+function voteProg(){const c=Object.keys(ME.stars).filter(k=>k!==ME.who).length;$('voteProg').textContent=`${c} de ${votables().length} con estrellas${ME.sent?' · enviados ✓':''}`;
   $('btnSend').disabled=!c||!VOTE_URL;$('btnSend').textContent=VOTE_URL?(ME.sent?'Volver a enviar':'Enviar mis votos'):'Votación en preparación';}
 $('btnWho').onclick=()=>{ME.who=null;vsave();renderVotar();};
-$('btnSend').onclick=async()=>{const votes={};for(const[k,v]of Object.entries(ME.notes))if(k!==ME.who)votes[k]=v;
+$('btnSend').onclick=async()=>{const votes={},pos={};for(const[k,v]of Object.entries(ME.stars))if(k!==ME.who)votes[k]=v*2;for(const[k,v]of Object.entries(ME.pos))if(k!==ME.who)pos[k]=v;
   $('btnSend').disabled=true;$('btnSend').textContent='Enviando…';
-  try{const r=await fetch(VOTE_URL,{method:'POST',body:JSON.stringify({voter:ME.id,who:ME.who||'',votes})});const d=await r.json();if(d&&d.players)VS=d;ME.sent=true;vsave();toast('¡Votos enviados!');location.hash='ranking';}
+  try{const r=await fetch(VOTE_URL,{method:'POST',body:JSON.stringify({voter:ME.id,who:ME.who||'',votes,pos})});const d=await r.json();if(d&&d.players)VS=d;ME.sent=true;vsave();toast('¡Votos enviados!');location.hash='ranking';}
   catch(e){toast('No se pudo enviar. Probá de nuevo en un rato.');voteProg();}};
 function renderRanking(){const rows=ROSTER.map(p=>{const v=VS.players&&VS.players[p.id];return{p,avg:v&&v.c?v.s/v.c:null,c:v?v.c:0};}).filter(r=>r.avg!==null).sort((a,b)=>b.avg-a.avg||b.c-a.c);
-  $('rankSub').textContent=VS.voters?`Promedio de los votos de ${VS.voters} ${VS.voters===1?'persona':'personas'}.`:'Todavía no votó nadie. ¡Arrancá vos!';
+  $('rankSub').textContent=VS.voters?`Con los votos de ${VS.voters} ${VS.voters===1?'persona':'personas'}.`:'Todavía no votó nadie. ¡Arrancá vos!';
   const top=rows.slice(0,3),order=[1,0,2],cols=['#e2b93b','#c9ced6','#c98b52'];
   $('podium').innerHTML=order.filter(i=>top[i]).map(i=>`<div class="pod p${i+1}"><span class="fig">${figHTML(top[i].p)}</span><span class="medal" style="background:${cols[i]}">${i+1}º</span>
-    <span class="step">${esc(top[i].p.name)}<br>${fmt1(top[i].avg)}</span></div>`).join('');
-  $('rlist').innerHTML=rows.slice(3).map((r,i)=>`<div class="rrow"><span class="pos">${i+4}º</span><span class="mini">${figHTML(r.p)}</span>
-    <div style="min-width:0"><div class="nm">${esc(r.p.name)}</div><div class="bar2"><i style="width:${r.avg*10}%"></i></div></div><span class="avg">${fmt1(r.avg)}<small>${r.c} ${r.c===1?'voto':'votos'}</small></span></div>`).join('')||
+    <span class="step">${starsHTML(top[i].avg)}</span></div>`).join('');
+  $('rlist').innerHTML=rows.slice(3).map((r,i)=>`<div class="rrow"><span class="pos">${i+4}º</span><span class="mini">${figHTML(r.p)}</span>${starsHTML(r.avg)}</div>`).join('')||
     (rows.length?'':'<p class="hint" style="text-align:center">Cuando alguien vote, acá aparece el podio.</p>');}
 
 /* ---------- Pestañas y guía ---------- */
