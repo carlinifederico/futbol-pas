@@ -172,6 +172,29 @@ body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset
 .ipos button:focus-visible{outline:2px dashed var(--red);outline-offset:1px}
 .iles{display:flex;gap:6px;align-items:center;font-family:var(--type);font-size:11.5px;font-weight:700;cursor:pointer}
 .iles input{width:16px;height:16px;accent-color:var(--red)}
+.savedline{font-family:var(--type);font-size:13px;background:var(--card);border:2px solid var(--ink);padding:8px 12px;margin-top:12px}
+.savedline b{color:var(--ok)}
+.vmeta{display:flex;flex-direction:column;gap:2px;font-family:var(--type);font-size:11.5px}
+.vmeta .ok{color:var(--ok)}.vmeta .todo{color:var(--red)}
+.vmeta .rstars{font-size:15px}
+.vsl{display:flex;flex-direction:column;gap:4px;background:#fff;border:2px solid var(--ink);padding:6px 8px}
+.vs{display:grid;grid-template-columns:72px minmax(0,1fr) 14px;align-items:center;gap:6px;cursor:pointer}
+.vs span{font-family:var(--type);font-size:11px;font-weight:700;text-transform:uppercase}
+.vs input{width:100%;height:18px;margin:0;accent-color:var(--red)}
+.vs i{font-style:normal;font-family:var(--display);font-size:15px;text-align:right}
+.vs.off input{opacity:.45}
+.abars{display:grid;grid-template-columns:1fr 1fr;gap:2px 8px;margin-top:2px}
+.ab{display:grid;grid-template-columns:24px minmax(0,1fr) 22px;align-items:center;gap:4px;font-family:var(--type);font-size:10px}
+.ab em{font-style:normal;font-weight:700;text-transform:uppercase;color:var(--ink-soft)}
+.ab b{text-align:right;font-weight:700}
+.abt{height:6px;background:var(--paper-2);border:1px solid var(--ink-soft)}.abt i{display:block;height:100%;background:var(--ink)}
+.bst{display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+.hist{display:inline-flex;align-items:center;gap:4px;background:none;border:0;padding:0;font-family:var(--type);font-size:10.5px;color:var(--ink-soft);cursor:pointer;text-decoration:underline dotted}
+.spark{display:block}
+.htable{width:100%;border-collapse:collapse;font-family:var(--type);font-size:12.5px}
+.htable th,.htable td{border-bottom:1px solid var(--line,#d8ccae);padding:4px 3px;text-align:center}
+.htable th:first-child,.htable td:first-child{text-align:left}
+.hbig{background:#fff;border:2px solid var(--ink);padding:8px}
 .bcard .novote{font-family:var(--type);font-size:11px;color:var(--ink-soft)}
 .tab[aria-current="page"]{background:var(--ink);color:var(--mustard)}
 .tab .dot{position:absolute;top:-9px;right:-8px;background:var(--red);color:#fff;font-size:11px;padding:1px 6px;border:2px solid var(--chalk);transform:rotate(8deg);animation:bob 1.6s ease-in-out infinite}
@@ -234,12 +257,12 @@ body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset
 
 <div class="wrap">
   <nav class="tabs" aria-label="Secciones">
-    <a class="tab" href="#votar" data-tab="votar"><span class="tn">1</span>Votar<span class="dot" id="voteDot">¡Votá!</span></a>
+    <a class="tab" href="#votar" data-tab="votar"><span class="tn">1</span>Calificar<span class="dot" id="voteDot">¡Calificá!</span></a>
     <a class="tab" href="#armar" data-tab="armar"><span class="tn">2</span>Armar partido</a>
     <button class="help" id="btnHelp" type="button">¿Cómo funciona?</button>
   </nav>
   <section id="v-armar">
-  <div class="votebanner" id="voteBanner" hidden><b>¿Ya votaste a tus compañeros?<br>Tus estrellas hacen que los equipos salgan parejos.</b><a class="btn primary" href="#votar">Votar ahora</a></div>
+  <div class="votebanner" id="voteBanner" hidden><b>¿Ya calificaste a tus compañeros?<br>Con tus calificaciones el armador reparte parejo.</b><a class="btn primary" href="#votar">Calificar ahora</a></div>
   <div class="top">
     <div><h1>Armá el partido</h1><p class="sub">1) Convocá a los 10 · 2) Armar parejos · 3) Retocá arrastrando en la cancha. Remera oscura contra remera clara.</p></div>
     <div class="bar">
@@ -278,7 +301,7 @@ body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset
     <section class="col plantel" aria-label="Plantel">
       <div class="benchbox" id="benchbox" data-drop="bench">
         <div class="bar" style="justify-content:space-between"><span class="stephead"><span class="num">1</span>¿Quiénes juegan?</span><span class="cnt" id="count"></span></div>
-        <p class="hint" style="margin:0">Tocá las figuritas de los 10 que juegan (otra vez para sacarlos). Debajo de cada una ajustás su posición y los deslizadores de velocidad, físico, precisión y aguante. Después tocá <b>Armar parejos</b>.</p>
+        <p class="hint" style="margin:0">Tocá las figuritas de los 10 que juegan (otra vez para sacarlos). Las estrellas salen de las calificaciones de todos. Después tocá <b>Armar parejos</b>.</p>
         <span class="convlbl">CONVOCADOS (tocá una cara para sacarlo)</span>
         <div class="conv" id="conv"></div>
         <div class="bench" id="bench"></div>
@@ -293,17 +316,18 @@ body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset
   </section>
 
   <section id="v-votar" hidden>
-    <div class="top"><div><h1>Votá a tus compañeros</h1><p class="sub">De 1 a 5 estrellas, sin registrarte. 🔒 Tu voto es secreto: tu celular genera una clave propia y nadie puede ver qué votaste, ni siquiera el organizador. Podés cambiarlo cuando quieras: vale el último.</p></div></div>
+    <div class="top"><div><h1>Calificá a tus compañeros</h1><p class="sub">Para cada uno: velocidad, físico, precisión y aguante, de 1 a 5. El promedio de todos da sus estrellas y es lo que usa el armador para repartir parejo. 🔒 Es secreto: nadie ve qué pusiste, ni el organizador.</p></div></div>
+    <div class="savedline" id="savedLine"></div>
     <div id="whoBox" class="col" style="margin-top:14px">
       <span class="stephead"><span class="num">1</span>¿Quién sos?</span>
-      <p class="hint" style="margin:0">Elegí tu figurita (así no te votás a vos mismo). Si no estás, tocá "Soy invitado".</p>
+      <p class="hint" style="margin:0">Elegí tu figurita (así no te calificás a vos mismo). Si no estás, tocá "Soy invitado".</p>
       <div class="whogrid" id="whoGrid"></div>
     </div>
     <div id="voteBox" class="col" style="margin-top:14px" hidden>
-      <div class="bar" style="justify-content:space-between"><span class="stephead"><span class="num">2</span>Poneles estrellas</span><button class="btn small" id="btnWho">Cambiar quién soy</button></div>
-      <p class="hint" style="margin:0">De 1 a 5 estrellas. Tocá de nuevo la misma estrella para borrarla.</p>
+      <div class="bar" style="justify-content:space-between"><span class="stephead"><span class="num">2</span>Calificá a cada uno</span><button class="btn small" id="btnWho">Cambiar quién soy</button></div>
+      <p class="hint" style="margin:0">Mové las barritas: 1 es poco, 5 es mucho. Se guarda solo. Podés volver a cambiarlo cuando quieras: vale lo último que pusiste.</p>
       <div class="vgrid" id="vgrid"></div>
-      <div class="sendbar"><b id="voteProg">0 notas</b><button class="btn primary" id="btnSend">Enviar mis votos</button></div>
+      <div class="sendbar"><b id="voteProg">0 calificados</b><button class="btn primary" id="btnSend">Listo</button></div>
     </div>
   </section>
 
@@ -314,9 +338,9 @@ body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset
   <form method="dialog">
     <h2 style="font-family:var(--display);font-weight:400;font-size:34px;text-transform:uppercase;margin:0;line-height:1">Bienvenido a Fútbol PAS</h2>
     <ol class="gsteps">
-      <li><span class="n">1</span><div><b>Votá a tus compañeros</b><p>Primero, en "Votar", ponele de 1 a 5 estrellas a cada uno. Es secreto. Sin estrellas el sistema no sabe quién es quién, así que esto es lo que hace que los equipos salgan parejos.</p></div></li>
-      <li><span class="n">2</span><div><b>Convocá a los 10</b><p>En "Armar partido", tocá las figuritas de los que juegan. Debajo de cada una ves sus estrellas. Debajo de cada una ajustás ahí mismo su posición y, con deslizadores chiquitos, velocidad, físico, precisión y aguante.</p></div></li>
-      <li><span class="n">3</span><div><b>Armar parejos</b><p>El botón amarillo reparte a los 10 en remera oscura y remera clara, mirando estrellas, posición y perfil. La barra de balance te muestra qué tan parejo quedó. ¿No te gusta? "Otra opción" o arrastrá figuritas.</p></div></li>
+      <li><span class="n">1</span><div><b>Calificá a tus compañeros</b><p>Primero, en "Calificar", poné velocidad, físico, precisión y aguante de cada uno (1 a 5). Es secreto y se guarda solo. El promedio de todos da sus estrellas: sin eso el armador no sabe quién es quién.</p></div></li>
+      <li><span class="n">2</span><div><b>Convocá a los 10</b><p>En "Armar partido", tocá las figuritas de los que juegan. Debajo de cada una ves sus estrellas (el promedio de todos) y su historial.</p></div></li>
+      <li><span class="n">3</span><div><b>Armar parejos</b><p>El botón amarillo reparte a los 10 en remera oscura y remera clara, mirando las estrellas, la posición y que velocidad, físico, precisión y aguante queden repartidos. La barra de balance te muestra qué tan parejo quedó. ¿No te gusta? "Otra opción" o arrastrá figuritas.</p></div></li>
       <li><span class="n">4</span><div><b>Compartí la cancha</b><p>Con "Compartir imagen" la mandás al grupo de WhatsApp.</p></div></li>
     </ol>
     <button class="btn primary">¡Vamos!</button>
@@ -334,6 +358,15 @@ body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset
 </dialog>
 
 <datalist id="ticks"><option value="-2"></option><option value="-1"></option><option value="0"></option><option value="1"></option><option value="2"></option></datalist>
+<dialog id="histDlg">
+  <form method="dialog">
+    <div class="dhead"><div class="mini" id="hMini"></div><div><h2 id="hName"></h2><p class="hint" id="hSub" style="margin:4px 0 0"></p></div></div>
+    <div class="hbig" id="hSpark"></div>
+    <div style="overflow-x:auto"><table class="htable" id="hTable"></table></div>
+    <p class="hint" style="margin:0">Las estrellas salen de sus características (velocidad, físico, precisión, aguante) y de los votos de todos. Acá ves cómo fueron cambiando.</p>
+    <button class="btn primary small">Cerrar</button>
+  </form>
+</dialog>
 <dialog id="addDlg">
   <form id="addFrm" method="dialog">
     <h2 style="font-family:var(--display);font-weight:400;font-size:28px;text-transform:uppercase;margin:0">Sumar jugador</h2>
@@ -412,7 +445,13 @@ function fixDet(d){if(!d)return d;if(d.pos==='ARQ')d.pos='ANY';for(const[k]of AT
   if(Array.isArray(d.tr)){const t=d.tr;if(t.includes('rapido'))d.vel=1;if(t.includes('lento'))d.vel=-1;if(t.includes('fuerte'))d.fis=1;
     if(t.includes('preciso')||t.includes('goleador'))d.pre=1;if(t.includes('impreciso'))d.pre=-1;if(t.includes('aguerrido'))d.res=1;if(t.includes('lesionado'))d.les=true;delete d.tr;}
   d.les=!!d.les;return d;}
-const det=id=>M.det[id]?fixDet(M.det[id]):(M.det[id]={pos:'ANY',vel:0,fis:0,pre:0,res:0,les:false,lvl:'5.5'});
+function consensus(id){const v=VS.players&&VS.players[id];if(!v)return null;const o={};
+  if(v.prof)for(const[k]of ATTRS)o[k]=Math.max(-2,Math.min(2,Math.round(v.prof[k]||0)));
+  if(v.pos){let b=null,n=0;for(const k in v.pos)if(v.pos[k]>n){n=v.pos[k];b=k;}if(b)o.pos=b;}return o;}
+const det=id=>{let d=M.det[id];if(!d)d=M.det[id]={pos:'ANY',vel:0,fis:0,pre:0,res:0,les:false,lvl:'5.5'};fixDet(d);
+  if(!d.mine){const c=consensus(id);if(c)Object.assign(d,c);}return d;};
+function touchProf(id){const d=det(id);d.mine=true;if(!String(id).startsWith('r'))return;ME.prof=ME.prof||{};
+  ME.prof[id]={vel:d.vel,fis:d.fis,pre:d.pre,res:d.res,pos:d.pos};ME.pDirty=true;ME.pending=true;vsave();scheduleSync(2500);}
 const get=(k,s)=>s<0?M[k].gk:M[k].s[s];
 function set(k,s,id){if(s<0)M[k].gk=id;else M[k].s[s]=id;}
 function where(id){for(const k of['A','B']){if(M[k].gk===id)return{k,s:-1};const i=M[k].s.indexOf(id);if(i>=0)return{k,s:i};}return null;}
@@ -420,9 +459,13 @@ const placed=()=>['A','B'].flatMap(k=>[M[k].gk,...M[k].s]).filter(Boolean);
 const members=k=>[M[k].gk,...M[k].s].filter(Boolean);
 
 /* ---------- Valores ocultos ---------- */
-function base(p){const v=VS.players&&VS.players[p.id];if(!v||!v.c)return p.r;const avg=v.s/v.c;return (p.r*3+avg*v.c)/(3+v.c);}
-function val(id){const p=P(id);if(!p)return 0;const d=det(id);let v=p.custom?parseFloat(d.lvl||'5.5'):base(p);
-  for(const[k]of ATTRS)v+=0.15*(d[k]||0);return v;}
+/* Cada persona califica Velocidad, Físico, Precisión y Aguante de 1 a 5. El promedio de todos da las estrellas.
+   Mientras haya pocas opiniones, se mezcla con el puntaje inicial (pesa como 2 opiniones). */
+function profOf(id){const v=VS.players&&VS.players[id];return v&&v.prof&&v.prof.n?v.prof:null;}
+const attrOf=(id,k)=>{const pr=profOf(id);return pr?pr[k]||0:0;};
+const starsFromAttrs=a=>(3+(a[0]+a[1]+a[2]+a[3])/4)*2;
+function val(id){const p=P(id);if(!p)return 0;if(p.custom)return parseFloat(det(id).lvl||'5.5');const pr=profOf(id);if(!pr)return p.r;
+  return (p.r*2+starsFromAttrs([pr.vel,pr.fis,pr.pre,pr.res])*pr.n)/(2+pr.n);}
 function teamVal(k){const t=M[k];return (t.gk?val(t.gk):0)+t.s.reduce((a,id)=>a+(id?val(id):0),0);}
 function verdictOf(d){return d<=1?['Muy parejo','#6fd08e']:d<=2.5?['Parejo','#e2b93b']:['Desparejo','#f08a80'];}
 
@@ -440,7 +483,7 @@ function computeOpts(pl){const first=pl[0],rest=pl.slice(1),hasDef=pl.some(id=>p
       if(hasDef&&!field.some(id=>posOf(id)==='DEF'))pen+=1;if(hasDel&&!field.some(id=>posOf(id)==='DEL'))pen+=.6;
       }
     /* que no quede todo lo rápido (o todo lo fuerte, preciso…) de un mismo lado */
-    for(const[k]of ATTRS){const sa=A.reduce((x,id)=>x+(det(id)[k]||0),0),sb=B.reduce((x,id)=>x+(det(id)[k]||0),0);pen+=0.3*Math.abs(sa-sb);}
+    for(const[k]of ATTRS){const sa=A.reduce((x,id)=>x+attrOf(id,k),0),sb=B.reduce((x,id)=>x+attrOf(id,k),0);pen+=0.4*Math.abs(sa-sb);}
     res.push({A,B,score:Math.abs(v[0]-v[1])*2+pen});}
   return res.sort((a,b)=>a.score-b.score).slice(0,12);}
 function applyOpt(o){for(const[k,ids]of[['A',o.A],['B',o.B]]){const g=pickGk(ids);M[k].gk=g;M[k].s=bestSlots(ids.filter(id=>id!==g),fm(k));}}
@@ -469,7 +512,7 @@ function removeFromPitch(id){const w=where(id);if(w)set(w.k,w.s,null);const i=M.
 /* ---------- Render ---------- */
 function commit(){save();render();}
 function render(){renderMeter();renderPitch();renderBench();renderSaved();}
-function renderMeter(){const nv=VS.voters||0;$('basis').innerHTML=nv?`Calculado con las estrellas secretas de ${nv} ${nv===1?'votante':'votantes'} y el perfil de cada jugador. <a href="#votar">Sumá tus estrellas</a>`:'Todavía nadie votó: usa los puntajes base y el perfil de cada jugador. <a href="#votar">Votá con estrellas</a> para afinarlo.';const a=teamVal('A'),b=teamVal('B'),n=placed().length;
+function renderMeter(){const nv=raters();$('basis').innerHTML=nv?`Calculado con las calificaciones secretas de ${nv} ${nv===1?'persona':'personas'}. <a href="#votar">Sumá las tuyas</a>`:'Todavía nadie calificó: usa los puntajes iniciales. <a href="#votar">Calificá</a> para afinarlo.';const a=teamVal('A'),b=teamVal('B'),n=placed().length;
   const pa=a+b>0?Math.round(a/(a+b)*100):50;$('barA').style.width=pa+'%';$('barB').style.width=(100-pa)+'%';
   $('barA').textContent=`Oscuros ${pa}%`;$('barB').textContent=`${100-pa}% Claros`;
   if(n<10){const c=M.sel.length;$('mTitle').textContent=`${c}/10 convocados`;$('mStamp').textContent=c<10?`Faltan ${10-c}`:'Tocá Armar parejos';$('mStamp').style.color=c<10?'#f7f1de':'#e2b93b';}
@@ -510,10 +553,20 @@ function renderPitch(){let s=pitchBase();
   s+=`<g transform="translate(26 40) rotate(-4)" pointer-events="none"><rect x="-4" y="-16" width="104" height="22" fill="#1b2442"/><text x="2" y="1" font-family="${DISPLAY}" font-size="15" fill="#f7f1de">REMERA OSCURA</text></g>`;
   s+=`<g transform="translate(278 612) rotate(3)" pointer-events="none"><rect x="-4" y="-16" width="100" height="22" fill="#fbf8ee" stroke="#1b2140"/><text x="2" y="1" font-family="${DISPLAY}" font-size="15" fill="#1b2140">REMERA CLARA</text></g>`;
   $('pitch').innerHTML=s;}
-function benchStars(p){const v=VS.players&&VS.players[p.id];if(!v||!v.c)return p.custom?'':'<span class="novote">Sin votos todavía</span>';
-  return starsHTML(v.s/v.c);}
+function histPts(p){const v=VS.players&&VS.players[p.id];if(!v||!v.h)return[];const n=(v.prof&&v.prof.n)||1;
+  return v.h.map(r=>{const a=r.slice(2,6);const st=(p.r*2+starsFromAttrs(a)*n)/(2+n);return{d:r[0],st:Math.max(0,Math.min(10,st)),a};});}
+function spark(pts,w=60,h=16){if(pts.length<2)return '';const xs=i=>2+i*(w-4)/(pts.length-1),ys=v=>h-2-(v/10)*(h-4);
+  const d=pts.map((q,i)=>(i?'L':'M')+xs(i).toFixed(1)+' '+ys(q.st).toFixed(1)).join(' ');
+  return `<svg class="spark" viewBox="0 0 ${w} ${h}" width="${w}" height="${h}" aria-hidden="true"><path d="${d}" fill="none" stroke="#1b2140" stroke-width="1.6"/><circle cx="${xs(pts.length-1)}" cy="${ys(pts[pts.length-1].st)}" r="2" fill="#d6453a"/></svg>`;}
+function attrBars(id){const pr=profOf(id);const p=P(id);if(p&&p.custom)return '';
+  return `<span class="abars" title="${pr?'Promedio de '+pr.n+(pr.n===1?' calificación':' calificaciones'):'Sin calificar todavía'}">${ATTRS.map(([k,l])=>{const v=pr?pr[k]+3:null;
+    return `<span class="ab"><em>${l.slice(0,3)}</em><span class="abt"><i style="width:${v?((v-1)/4*100):0}%"></i></span><b>${v?v.toFixed(1).replace('.',','):'–'}</b></span>`;}).join('')}</span>`;}
+function benchStars(p){const pr=profOf(p.id),n=pr?pr.n:0,pts=histPts(p);if(p.custom)return '';
+  return `<span class="bst" data-bst="${p.id}">${starsHTML(Math.max(0,Math.min(10,val(p.id))))}<button type="button" class="hist" data-hist="${p.id}" title="Ver historial">${n?n+(n===1?' opinión':' opiniones'):'sin calificar'}${spark(pts)}</button></span>`;}
+function refreshStars(id){const el=document.querySelector(`[data-bst="${id}"]`);if(el)el.outerHTML=benchStars(P(id));}
 const POS_S=[['ANY','Cualq.'],['DEF','Def'],['MED','Medio'],['DEL','Del']];
 function attrTxt(k,v){const a=ATTRS.find(x=>x[0]===k);if(!v)return a[1];return (Math.abs(v)>1?'Muy ':'')+(v>0?a[3]:a[2]).toLowerCase().replace(/^./,c=>Math.abs(v)>1?c:c.toUpperCase());}
+function posChip(id){const d=det(id);return d.pos&&d.pos!=='ANY'?`<span class="pchips"><span class="pchip">${POS.find(x=>x[0]===d.pos)[1]}</span></span>`:'';}
 function inlHTML(id){const d=det(id);
   return `<div class="inl" data-inl="${id}">
     <div class="ipos" role="group" aria-label="Posición">${POS_S.map(([k,l])=>`<button type="button" data-ip="${k}" aria-pressed="${d.pos===k}">${l}</button>`).join('')}</div>
@@ -534,7 +587,7 @@ function renderBench(){const c=M.sel.length,armed=placed().length===10;$('count'
     const on=isSel(p.id);
     return `<div class="bcard${on?' in':''}" data-drag="${p.id}" tabindex="0" role="button" aria-pressed="${on}" aria-label="${esc(p.name)}${on?', convocado':''}">
       ${w?`<span class="tag ${w.k}">${TEAM[w.k].name}</span>`:''}<span class="chk">✓ CONVOCADO</span>
-      <span class="fig" style="--rot:${rot(p.id)*.6}deg">${figHTML(p)}</span><span class="nm">${esc(p.name)}</span>${benchStars(p)}${inlHTML(p.id)}</div>`;}).join('')+
+      <span class="fig" style="--rot:${rot(p.id)*.6}deg">${figHTML(p)}</span><span class="nm">${esc(p.name)}</span>${benchStars(p)}${attrBars(p.id)}${posChip(p.id)}</div>`;}).join('')+
     `<button type="button" class="add" id="btnAdd"><span><b>+</b>Sumar jugador</span></button>`;
   $('btnAdd').onclick=openAdd;}
 function renderSaved(){$('savedWrap').hidden=!DB.matches.length;
@@ -547,7 +600,7 @@ function renderSaved(){$('savedWrap').hidden=!DB.matches.length;
 /* ---------- Arrastrar y soltar (mouse y dedo) ---------- */
 let drag=null,hot=null;
 function setHot(el){if(hot===el)return;hot?.classList.remove('hot');hot=el;hot?.classList.add('hot');}
-document.addEventListener('pointerdown',e=>{if(e.button>0||e.target.closest('[data-info]')||e.target.closest('.inl'))return;const src=e.target.closest('[data-drag]');if(!src)return;
+document.addEventListener('pointerdown',e=>{if(e.button>0||e.target.closest('[data-info]')||e.target.closest('.inl')||e.target.closest('[data-hist]'))return;const src=e.target.closest('[data-drag]');if(!src)return;
   drag={id:src.dataset.drag,x:e.clientX,y:e.clientY,src,moved:false,ghost:null};});
 document.addEventListener('pointermove',e=>{if(!drag)return;
   if(!drag.moved){if(Math.hypot(e.clientX-drag.x,e.clientY-drag.y)<7)return;drag.moved=true;document.body.classList.add('dragging');
@@ -571,23 +624,33 @@ function tap(id,src){if(src.classList.contains('mk')){openDet(id);return;}
   if(M.sel.length>=10){toast('Ya hay 10 convocados. Tocá a alguien para sacarlo.');return;}
   M.sel.push(id);opts=[];commit();return;if(autoPlace(id)){opts=[];commit();toast(`${P(id).name} → ${TEAM[where(id).k].name}`);}}
 
+/* ---------- Historial ---------- */
+function openHist(id){const p=P(id),pts=histPts(p),v=VS.players&&VS.players[id];
+  $('hMini').innerHTML=figHTML(p);$('hName').textContent=p.name;
+  $('hSub').innerHTML=`${starsHTML(Math.max(0,Math.min(10,val(id))))} · ${v&&v.prof?v.prof.n+(v.prof.n===1?' opinión de perfil':' opiniones de perfil'):'perfil sin opiniones'}`;
+  $('hSpark').innerHTML=pts.length>1?spark(pts,300,70).replace('class="spark"','class="spark" style="width:100%;height:auto"'):'<span class="hint">Todavía no hay historial: se arma con los votos y cambios de perfil de todos.</span>';
+  const f=x=>x>0?'+'+x:String(x);
+  $('hTable').innerHTML=pts.length?`<tr><th>Fecha</th><th>Estrellas</th><th>Vel.</th><th>Fís.</th><th>Prec.</th><th>Agu.</th></tr>`+
+    pts.slice().reverse().map(q=>`<tr><td>${q.d.slice(8,10)}/${q.d.slice(5,7)}</td><td>${(q.st/2).toFixed(1).replace('.',',')}</td>${q.a.map(x=>`<td>${f(x)}</td>`).join('')}</tr>`).join(''):'';
+  $('histDlg').showModal();}
+document.addEventListener('click',e=>{const h=e.target.closest('[data-hist]');if(h){e.stopPropagation();openHist(h.dataset.hist);}},true);
 /* ---------- Edición en la tarjeta ---------- */
 $('bench').addEventListener('click',e=>{const box=e.target.closest('[data-inl]');if(!box)return;const id=box.dataset.inl,d=det(id);
   const bp=e.target.closest('[data-ip]');if(!bp)return;d.pos=bp.dataset.ip;
-  e.stopPropagation();opts=[];save();renderMeter();box.querySelectorAll('[data-ip]').forEach(x=>x.setAttribute('aria-pressed',x===bp));});
-$('bench').addEventListener('input',e=>{const r=e.target.closest('[data-ia]');if(!r)return;const id=r.closest('[data-inl]').dataset.inl;det(id)[r.dataset.ia]=+r.value;opts=[];save();renderMeter();});
+  e.stopPropagation();opts=[];save();touchProf(id);renderMeter();box.querySelectorAll('[data-ip]').forEach(x=>x.setAttribute('aria-pressed',x===bp));});
+$('bench').addEventListener('input',e=>{const r=e.target.closest('[data-ia]');if(!r)return;const id=r.closest('[data-inl]').dataset.inl;det(id)[r.dataset.ia]=+r.value;opts=[];save();touchProf(id);renderMeter();refreshStars(id);});
 $('bench').addEventListener('change',e=>{const c=e.target.closest('[data-il]');if(!c)return;const id=c.closest('[data-inl]').dataset.inl;det(id).les=c.checked;opts=[];save();renderMeter();});
 /* ---------- Detalles ---------- */
-function openDet(id){detId=id;const p=P(id),d=det(id),w=where(id);
+function openDet(id){openHist(id);return;detId=id;const p=P(id),d=det(id),w=where(id);
   $('dMini').innerHTML=figHTML(p);$('dName').textContent=p.name;$('dWhere').textContent=w?`En ${TEAM[w.k].name} · ${w.s<0?'Arquero':FORMS[fm(w.k)][w.s].l}`:'En el plantel';
   $('dPos').innerHTML=POS.map(([k,l])=>`<button type="button" data-p="${k}" aria-pressed="${d.pos===k}">${l}</button>`).join('');
   $('dTr').innerHTML=ATTRS.map(([k,l,lo,hi])=>`<div class="sl"><span class="sl-l">${l}</span><input type="range" min="-2" max="2" step="1" value="${d[k]||0}" id="sl-${k}" data-a="${k}" aria-label="${l}" list="ticks"></div>`).join('');
 
   $('dLvlWrap').hidden=!p.custom;$('dLvl').innerHTML=LEVELS.map(([k,l])=>`<button type="button" data-l="${k}" aria-pressed="${d.lvl===k}">${l}</button>`).join('');
   $('dOut').hidden=!w;$('detDlg').showModal();}
-$('dPos').onclick=e=>{const b=e.target.closest('[data-p]');if(!b)return;det(detId).pos=b.dataset.p;opts=[];
+$('dPos').onclick=e=>{const b=e.target.closest('[data-p]');if(!b)return;det(detId).pos=b.dataset.p;opts=[];touchProf(detId);
   $('dPos').querySelectorAll('button').forEach(x=>x.setAttribute('aria-pressed',x===b));commit();};
-$('dTr').addEventListener('input',e=>{const r=e.target.closest('[data-a]');if(!r)return;det(detId)[r.dataset.a]=+r.value;opts=[];commit();});
+$('dTr').addEventListener('input',e=>{const r=e.target.closest('[data-a]');if(!r)return;det(detId)[r.dataset.a]=+r.value;opts=[];touchProf(detId);commit();});
 
 $('dLvl').onclick=e=>{const b=e.target.closest('[data-l]');if(!b)return;det(detId).lvl=b.dataset.l;$('dLvl').querySelectorAll('button').forEach(x=>x.setAttribute('aria-pressed',x===b));opts=[];commit();};
 $('dOut').onclick=()=>{removeFromPitch(detId);$('detDlg').close();};
@@ -651,35 +714,42 @@ async function fetchVotes(){if(!VOTE_URL)return;try{const r=await fetch(VOTE_URL
 function renderWho(){$('whoGrid').innerHTML=ROSTER.map(p=>`<button type="button" class="who" data-who="${p.id}"><span class="fig">${figHTML(p)}</span><span>${esc(p.name)}</span></button>`).join('')+
   `<button type="button" class="who" data-who="guest"><span class="fig" style="display:grid;place-items:center;font-family:var(--display);font-size:40px">?</span><span>Soy invitado</span></button>`;
   $('whoGrid').querySelectorAll('[data-who]').forEach(b=>b.onclick=()=>{ME.who=b.dataset.who==='guest'?'':b.dataset.who;delete ME.stars[ME.who];delete ME.pos[ME.who];vsave();renderVotar();window.scrollTo(0,0);});}
-function cardHTML(p){const n=ME.stars[p.id]||0,ps=ME.pos[p.id];
-  return `<div class="vcard${n?' done':''}" data-card="${p.id}"><span class="fig" style="--rot:${rot(p.id)*.6}deg">${figHTML(p)}</span>
-    <div class="stars" role="group" aria-label="Estrellas para ${esc(p.name)}">${[1,2,3,4,5].map(k=>`<button type="button" data-v="${p.id}" data-n="${k}" class="${k<=n?'on':''}" aria-label="${k} ${k===1?'estrella':'estrellas'}" aria-pressed="${n===k}">★</button>`).join('')}</div></div>`;}
-function renderVotar(){const chose=ME.who!==null;$('whoBox').hidden=chose;$('voteBox').hidden=!chose;
+function cardHTML(p){const m=ME.prof&&ME.prof[p.id],pr=profOf(p.id);
+  return `<div class="vcard${m?' done':''}" data-card="${p.id}"><span class="fig" style="--rot:${rot(p.id)*.6}deg">${figHTML(p)}</span>
+    <div class="vmeta">${m?'<b class="ok">✓ Calificado</b>':'<b class="todo">Sin calificar</b>'}<span>Promedio de todos: ${starsHTML(Math.max(0,Math.min(10,val(p.id))))}</span>${attrBars(p.id)}</div>
+    <div class="vsl">${ATTRS.map(([k,l])=>{const v=m?m[k]+3:3;return `<label class="vs${m?'':' off'}"><span>${l}</span><input type="range" min="1" max="5" step="1" value="${v}" data-vp="${p.id}" data-k="${k}" aria-label="${l} de ${esc(p.name)}, de 1 a 5"><i>${m?v:'–'}</i></label>`;}).join('')}</div>
+    <div class="ipos" role="group" aria-label="Posición">${POS_S.map(([k,l])=>`<button type="button" data-vpos="${p.id}" data-p="${k}" aria-pressed="${(m?m.pos:'ANY')===k}">${l}</button>`).join('')}</div></div>`;}
+function renderVotar(){const chose=ME.who!==null;$('whoBox').hidden=chose;$('voteBox').hidden=!chose;savedLine();
   if(!chose){renderWho();return;}
   $('vgrid').innerHTML=votables().map(cardHTML).join('');voteProg();}
-$('vgrid').addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;
-  if(b.dataset.n){const id=b.dataset.v,n=+b.dataset.n;ME.stars[id]=ME.stars[id]===n?0:n;if(!ME.stars[id])delete ME.stars[id];}
-  else if(b.dataset.p){const id=b.dataset.pv;ME.pos[id]=ME.pos[id]===b.dataset.p?undefined:b.dataset.p;if(!ME.pos[id])delete ME.pos[id];}
-  else return;
-  ME.sent=false;ME.pending=true;vsave();const id=b.dataset.v||b.dataset.pv;const card=b.closest('.vcard');card.outerHTML=cardHTML(P(id));scheduleSync(1500);voteProg();});
+function rate(id,patch){ME.prof=ME.prof||{};const cur=ME.prof[id]||{vel:0,fis:0,pre:0,res:0,pos:'ANY'};ME.prof[id]=Object.assign(cur,patch);
+  ME.pDirty=true;ME.pending=true;vsave();scheduleSync(1500);}
+$('vgrid').addEventListener('input',e=>{const r=e.target.closest('[data-vp]');if(!r)return;const id=r.dataset.vp,was=!!(ME.prof&&ME.prof[id]);
+  rate(id,{[r.dataset.k]:+r.value-3});if(!was){const c=r.closest('.vcard');c.outerHTML=cardHTML(P(id));}else{r.nextElementSibling.textContent=r.value;}voteProg();});
+$('vgrid').addEventListener('click',e=>{const b=e.target.closest('[data-vpos]');if(!b)return;const id=b.dataset.vpos;rate(id,{pos:b.dataset.p});
+  b.closest('.vcard').outerHTML=cardHTML(P(id));voteProg();});
+function raters(){let n=0;for(const k in VS.players||{}){const pr=VS.players[k].prof;if(pr&&pr.n>n)n=pr.n;}return n;}
+function savedLine(){const mine=Object.keys(ME.prof||{}).length,nr=raters();
+  $('savedLine').innerHTML=(mine?`<b>✓ Tus calificaciones están guardadas</b> (${mine} jugadores${ME.savedAt?', último cambio '+ME.savedAt:''}). Siguen guardadas aunque cierres la página.`:'<b>Todavía no calificaste a nadie.</b>')+
+    ` · ${nr?`Ya calificaron ${nr} ${nr===1?'persona':'personas'}.`:'Nadie calificó todavía: sé el primero.'}`;}
 /* Guardado automático: cada estrella se manda sola unos segundos después; si no hay señal, queda pendiente y se reintenta. */
 let syncTimer=null,syncing=false,syncFails=0,syncState='';
 function scheduleSync(ms){clearTimeout(syncTimer);syncTimer=setTimeout(syncVotes,ms);}
 async function syncVotes(){if(!VOTE_URL||!ME.pending)return;if(syncing){scheduleSync(1200);return;}
-  const votes={};for(const[k,v]of Object.entries(ME.stars))if(k!==ME.who)votes[k]=v*2;
-  if(!Object.keys(votes).length){ME.pending=false;vsave();voteProg();return;}
+  const votes={};if(ME.vDirty!==false)for(const[k,v]of Object.entries(ME.stars))if(k!==ME.who)votes[k]=v*2;
+  const profile=ME.pDirty?Object.assign({},ME.prof):{};
+  if(!Object.keys(votes).length&&!Object.keys(profile).length){ME.pending=false;vsave();voteProg();return;}
   syncing=true;syncState='saving';voteProg();
-  try{const r=await fetch(VOTE_URL,{method:'POST',body:JSON.stringify({voter:ME.id,who:ME.who||'',votes})});const d=await r.json();
-    if(d&&d.players)VS=d;ME.sent=true;ME.pending=false;syncFails=0;syncState='ok';vsave();route&&(document.getElementById('voteDot').hidden=true,document.getElementById('voteBanner').hidden=true);}
+  try{const r=await fetch(VOTE_URL,{method:'POST',body:JSON.stringify({voter:ME.id,who:ME.who||'',votes,profile})});const d=await r.json();
+    if(d&&d.players){VS=d;renderBench();renderMeter();}if(Object.keys(votes).length){ME.sent=true;ME.vDirty=false;}if(Object.keys(profile).length){ME.pDirty=false;ME.sent=true;const t=new Date();ME.savedAt=t.toLocaleDateString('es-AR',{day:'2-digit',month:'2-digit'})+' '+t.toLocaleTimeString('es-AR',{hour:'2-digit',minute:'2-digit'});}ME.pending=false;syncFails=0;syncState='ok';vsave();route&&(document.getElementById('voteDot').hidden=true,document.getElementById('voteBanner').hidden=true);}
   catch(e){syncFails++;syncState='retry';scheduleSync(Math.min(60000,4000*syncFails));}
   finally{syncing=false;voteProg();}}
 window.addEventListener('online',()=>{if(ME.pending)scheduleSync(500);});
-function voteProg(){const c=Object.keys(ME.stars).filter(k=>k!==ME.who).length,tot=votables().length;
-  const st=!VOTE_URL?'Votación en preparación':syncState==='saving'?'Guardando…':syncState==='retry'?'Sin señal: se guarda solo cuando vuelva':ME.pending?'Guardando…':ME.sent?'✓ Guardado':'Se guarda solo al tocar';
-  $('voteProg').textContent=`${c} de ${tot} con estrellas · ${st}`;
-  $('btnSend').disabled=false;$('btnSend').textContent=c>=tot?'¡Listo! Ir a armar':'Listo';}
+function voteProg(){const c=Object.keys(ME.prof||{}).filter(k=>k!==ME.who).length,tot=votables().length;
+  const st=!VOTE_URL?'en preparación':syncState==='saving'||ME.pending?'Guardando…':syncState==='retry'?'Sin señal: se guarda solo cuando vuelva':c?'✓ Guardado':'Se guarda solo';
+  $('voteProg').textContent=`${c} de ${tot} calificados · ${st}`;$('btnSend').textContent=c>=tot?'¡Listo! Ir a armar':'Listo, ir a armar';savedLine();}
 $('btnWho').onclick=()=>{ME.who=null;vsave();renderVotar();};
-$('btnSend').onclick=()=>{if(ME.pending)syncVotes();toast('¡Gracias! Tus estrellas ya cuentan para el balance.');location.hash='armar';};
+$('btnSend').onclick=()=>{if(ME.pending)syncVotes();toast('¡Gracias! Tus calificaciones ya cuentan para el balance.');location.hash='armar';};
 function renderRanking(){const rows=ROSTER.map(p=>{const v=VS.players&&VS.players[p.id];return{p,avg:v&&v.c?v.s/v.c:null,c:v?v.c:0};}).filter(r=>r.avg!==null).sort((a,b)=>b.avg-a.avg||b.c-a.c);
   $('rankSub').textContent=VS.voters?`Con los votos de ${VS.voters} ${VS.voters===1?'persona':'personas'}.`:'Todavía no votó nadie. ¡Arrancá vos!';
   const top=rows.slice(0,3),order=[1,0,2],cols=['#e2b93b','#c9ced6','#c98b52'];
@@ -690,7 +760,7 @@ function renderRanking(){const rows=ROSTER.map(p=>{const v=VS.players&&VS.player
 
 /* ---------- Pestañas y guía ---------- */
 let view='armar';
-function route(){const h=(location.hash||(ME.sent?'#armar':'#votar')).slice(1);view=['armar','votar'].includes(h)?h:'armar';
+function route(){const h=(location.hash||'#armar').slice(1);view=['armar','votar'].includes(h)?h:'armar';
   ['armar','votar'].forEach(v=>$('v-'+v).hidden=v!==view);
   document.querySelectorAll('.tab').forEach(t=>t.setAttribute('aria-current',t.dataset.tab===view?'page':'false'));
   $('voteDot').hidden=ME.sent;$('voteBanner').hidden=ME.sent||!VOTE_URL;
@@ -698,7 +768,7 @@ function route(){const h=(location.hash||(ME.sent?'#armar':'#votar')).slice(1);v
 window.addEventListener('hashchange',()=>{route();window.scrollTo(0,0);});
 $('btnHelp').onclick=()=>$('guideDlg').showModal();
 
-load();vload();syncInputs();render();route();fetchVotes();if(ME.pending)scheduleSync(2000);
+load();vload();syncInputs();render();route();fetchVotes();if(ME.pending)scheduleSync(2000);setInterval(()=>{if(!document.hidden)fetchVotes();},60000);
 try{if(!localStorage.getItem('pas-guia-vista')){$('guideDlg').showModal();localStorage.setItem('pas-guia-vista','1');}}catch(e){}
 
 </script>
