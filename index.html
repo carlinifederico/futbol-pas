@@ -252,12 +252,12 @@ const members=k=>[M[k].gk,...M[k].s].filter(Boolean);
 /* El promedio de todos (nunca se muestra como puntaje) es lo que usa el armador. Con pocas opiniones se mezcla con el puntaje inicial (pesa como 2). */
 function profOf(id){if(!VOTACION_ABIERTA)return null;const v=VS.players&&VS.players[id];return v&&v.prof&&v.prof.n?v.prof:null;}
 const attrN=(pr,k)=>!pr?0:pr.k?(pr.k[KI[k]]||0):pr.n;
-const attrOf=(id,k)=>{const pr=profOf(id),c=attrN(pr,k);return c?(pr[k]||0)*c/(c+1):0;};
+const attrOf=(id,k)=>{const pr=profOf(id);return attrN(pr,k)?(pr[k]||0):0;};
 const starsFromAttrs=a=>(3+(a[0]+a[1]+a[2]+a[3])/4)*2;
-function val(id){const p=P(id);if(!p)return 0;if(p.custom)return parseFloat(det(id).lvl||'5.5');const pr=profOf(id);if(!pr)return p.r;
-  const w=ATTRS.reduce((a,[k])=>a+attrN(pr,k),0)/4;if(!w)return p.r;
-  const lvl=(3+ATTRS.reduce((a,[k])=>a+(pr[k]||0)*(attrN(pr,k)?1:0),0)/Math.max(1,ATTRS.filter(([k])=>attrN(pr,k)).length))*2;
-  return (p.r+lvl*w)/(1+w);}
+/* Puntaje de cada jugador = promedio real (1 a 5) de sus 4 características según todos los votos; sin votos, su puntaje inicial. val = puntaje x 2. */
+function score(id){const p=P(id);if(!p)return 0;if(p.custom)return parseFloat(det(id).lvl||'5.5')/2;const pr=profOf(id),ks=ATTRS.filter(([k])=>attrN(pr,k));
+  return ks.length?ks.reduce((a,[k])=>a+(pr[k]||0)+3,0)/ks.length:p.r/2;}
+function val(id){return score(id)*2;}
 function teamVal(k){const t=M[k];return (t.gk?val(t.gk):0)+t.s.reduce((a,id)=>a+(id?val(id):0),0);}
 function verdictOf(d){return d<=1?['Muy parejo','v1']:d<=2.5?['Parejo','v2']:['Desparejo','v3'];}
 
@@ -329,8 +329,8 @@ $('pitch').addEventListener('click',e=>{const x=e.target.closest('[data-rmx]');i
 /* ---------- Arriba: balance y botones ---------- */
 $('btnClr').onclick=()=>{const was=M.sel.slice();M.sel=[];for(const k of['A','B']){M[k].gk=null;M[k].s=M[k].s.map(()=>null);}opts=[];pick=null;commit();was.forEach(updateRow);toast('Cancha limpia');};
 /* promedio real de cada equipo, en la misma escala de los votos (1 a 5) */
-function balInfo(){const na=members('A').length,nb=members('B').length,avA=na?teamVal('A')/na/2:0,avB=nb?teamVal('B')/nb/2:0;
-  const pa=na&&nb&&avA+avB>0?avA/(avA+avB)*100:50;const q=Math.round(pa*100)/100,f=x=>x.toFixed(2).replace('.',',');return{avA,avB,pa,pr:f(q),pb:f(Math.round((100-q)*100)/100),dif:f(Math.abs(Math.round((2*q-100)*100)/100))};}
+function balInfo(){const na=members('A').length,nb=members('B').length,sA=members('A').reduce((x,id)=>x+score(id),0),sB=members('B').reduce((x,id)=>x+score(id),0),avA=na?sA/na:0,avB=nb?sB/nb:0;
+  const pa=na&&nb&&sA+sB>0?sA/(sA+sB)*100:50;const q=Math.round(pa*100)/100,f=x=>x.toFixed(2).replace('.',',');return{avA,avB,pa,pr:f(q),pb:f(Math.round((100-q)*100)/100),dif:f(Math.abs(Math.round((2*q-100)*100)/100))};}
 function renderTop(){renderPitch();const n=placed().length,c=M.sel.length,a=teamVal('A'),b=teamVal('B');
   const{avA,avB,pa,pr,pb,dif}=balInfo();const K=$('balK');K.style.left=pa+'%';if(K._p!=null&&Math.abs(K._p-pa)>.05){K.classList.remove('mv');void K.offsetWidth;K.classList.add('mv');}K._p=pa;$('barA').style.width=pa+'%';$('barB').style.width=(100-pa)+'%';
   const full=members('A').length&&members('B').length;$('barA').textContent=full?`Oscuros ${pr}%`:'Oscuros';$('barB').textContent=full?`${pb}% Claros`:'Claros';

@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex,nofollow">
+<title>Fútbol PAS · Puntajes</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Anton&family=Inter:wght@400;600;700&display=swap">
+<style>
+:root{--paper:#efe5cc;--ink:#1b2140;--soft:#5a5a6e;--line:rgba(27,33,64,.14);--ok:#24702f}
+*{box-sizing:border-box}
+body{margin:0;background:var(--paper);color:var(--ink);font:14px/1.35 Inter,system-ui,sans-serif;padding:16px 12px 40px}
+h1{font:400 26px/1 Anton,Impact,sans-serif;text-transform:uppercase;margin:0 0 4px}
+.sub{color:var(--soft);font-size:12px;margin:0 0 14px}
+.wrap{overflow-x:auto;-webkit-overflow-scrolling:touch}
+table{border-collapse:collapse;width:100%;min-width:560px;background:#fbf6e6;border:2px solid var(--ink)}
+th,td{padding:6px 7px;border-bottom:1px solid var(--line);text-align:right;white-space:nowrap}
+th{font:600 11px Inter,sans-serif;text-transform:uppercase;letter-spacing:.03em;color:var(--soft);cursor:pointer;user-select:none;position:sticky;top:0;background:#fbf6e6}
+th.on{color:var(--ink)}th.on::after{content:" ▾"}
+td.n,th.n{text-align:left}
+td.n{display:flex;align-items:center;gap:8px;font:400 16px Anton,Impact,sans-serif;text-transform:uppercase}
+td.n img{width:30px;height:36px;object-fit:cover;object-position:top;border:1.5px solid var(--ink);border-radius:2px}
+td.pt{font-weight:800;font-size:15px;color:var(--ok)}
+td.x{color:var(--soft)}
+.foot{color:var(--soft);font-size:12px;margin-top:10px}
+</style></head><body>
+<h1>Puntajes</h1>
+<p class="sub" id="sub">Cargando…</p>
+<div class="wrap"><table><thead><tr id="hd"></tr></thead><tbody id="tb"></tbody></table></div>
+<p class="foot">Puntaje = promedio de Ataque, Defensa, Técnica y Físico (1 a 5) con todos los votos. Es el mismo número que usa el armador y la barra de balance. Se actualiza solo cada 30 segundos.</p>
+<script>
+const COLS=[['i','#'],['name','Jugador'],['pt','Puntaje'],['vel','Ataque'],['res','Defensa'],['pre','Técnica'],['fis','Físico'],['n','Votos'],['pos','Posición']];
+const KI={vel:0,fis:1,pre:2,res:3},PN={ARQ:'Arquero',DEF:'Defensa',MED:'Medio',DEL:'Delantero'};
+let ROSTER=[],URL_='',rows=[],sortK='pt';
+const f2=x=>x==null?'–':x.toFixed(2).replace('.',','),esc=s=>String(s).replace(/[&<>"']/g,c=>'&#'+c.charCodeAt(0)+';');
+async function init(){let h;try{h=await (await fetch('index.html?t='+Date.now(),{cache:'no-store'})).text();if(!/const ROSTER=/.test(h))throw 0;}catch(e){$sub.textContent='Cargando… (reintentando)';setTimeout(init,3000);return;}
+  ROSTER=new Function('return ['+h.match(/const ROSTER=\[([\s\S]*?)\];/)[1]+']')();URL_=h.match(/const VOTE_URL='([^']+)'/)[1];load();setInterval(load,30000);}
+async function load(){try{const d=await (await fetch(URL_)).json(),P=d.players||{};
+  rows=ROSTER.map(p=>{const v=P[p.id]||{},pr=v.prof||{},k=pr.k||[0,0,0,0],o={id:p.id,name:p.name,f:p.f,n:pr.n||0};
+    const got=[];for(const a of['vel','res','pre','fis']){o[a]=k[KI[a]]?pr[a]+3:null;if(o[a]!=null)got.push(o[a]);}
+    o.pt=got.length?got.reduce((x,y)=>x+y,0)/got.length:null;
+    const ps=Object.entries(v.pos||{}).filter(([x])=>x!=='ANY').sort((a,b)=>b[1]-a[1])[0];o.pos=ps?PN[ps[0]]:'–';return o;});
+  $sub.textContent=`Actualizado ${new Date().toLocaleTimeString('es-AR',{hour:'2-digit',minute:'2-digit',second:'2-digit'})} · ${rows.reduce((a,r)=>a+r.n,0)} votos`;render();}
+  catch(e){$sub.textContent='No se pudo cargar. Reintenta en 30 s.';}}
+function render(){const r=rows.slice().sort((a,b)=>{const x=a[sortK],y=b[sortK];if(typeof x==='string'||typeof y==='string')return String(x).localeCompare(String(y));return (y??-1)-(x??-1);});
+  hd.innerHTML=COLS.map(([k,l])=>`<th class="${k==='name'?'n':''}${k===sortK?' on':''}" data-k="${k}">${l}</th>`).join('');
+  tb.innerHTML=r.map((o,i)=>`<tr><td class="x">${i+1}</td><td class="n"><img src="figus/web/${esc(o.f)}-mini.jpg" alt="">${esc(o.name)}</td><td class="pt">${f2(o.pt)}</td>${['vel','res','pre','fis'].map(a=>`<td>${f2(o[a])}</td>`).join('')}<td class="x">${o.n}</td><td class="x">${o.pos}</td></tr>`).join('');}
+const $sub=document.getElementById('sub'),hd=document.getElementById('hd'),tb=document.getElementById('tb');
+hd.addEventListener('click',e=>{const t=e.target.closest('[data-k]');if(!t||t.dataset.k==='i')return;sortK=t.dataset.k;render();});
+window.addEventListener('load',init);
+</script></body></html>

@@ -2,3 +2,5 @@
   Cache-Control: no-cache
 /index.html
   Cache-Control: no-cache
+/tabla.html
+  Cache-Control: no-cache
