@@ -381,8 +381,9 @@ function renderList(){if(SL){listDirty=true;return;}listDirty=false;$('soy').par
   if(anc){const r=document.querySelector(`[data-row="${anc.id}"]`);if(r)L.scrollTop+=r.getBoundingClientRect().top-anc.top;}}
 /* ranking: primero el de mayor puntaje promedio; los que no tienen votos, al final; los invitados, abajo de todo */
 function avgTxt(id){const pr=profOf(id);return pr&&ATTRS.some(([k])=>attrN(pr,k))?`prom. <b>${score(id).toFixed(2).replace('.',',')}</b>`:'sin prom.';}
-function rankedList(){const has=id=>{const pr=profOf(id);return !!pr&&ATTRS.some(([k])=>attrN(pr,k));};
-  return ROSTER.slice().sort((a,b)=>(has(b.id)-has(a.id))||(score(b.id)-score(a.id))||a.name.localeCompare(b.name)).concat(DB.custom);}
+/* orden al azar, nuevo cada vez que se abre la app (fijo mientras está abierta) */
+const SHUF=(()=>{const a=ROSTER.map(p=>p.id);for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;})();
+function rankedList(){const byId=Object.fromEntries(ROSTER.map(p=>[p.id,p]));return SHUF.map(id=>byId[id]).filter(Boolean).concat(DB.custom);}
 /* Actualiza una fila sin rearmarla (no corta el arrastre de la barrita) */
 function updateRow(id){const r=document.querySelector(`[data-row="${id}"]`),p=P(id);if(!r||!p)return;const av=r.querySelector('[data-avg]');if(av)av.innerHTML=avgTxt(id);const on=isSel(id);
   r.classList.toggle('on',on);r.querySelector('.face').setAttribute('aria-pressed',on);
